@@ -394,6 +394,30 @@ body.runner .btn.primary{background:linear-gradient(150deg,var(--mint),var(--min
 .rolecard .rt{font-family:var(--disp);font-weight:700;font-size:18px;letter-spacing:-.02em}
 .rolecard .rd{font-size:13px;color:var(--t2);margin-top:4px;line-height:1.42}
 .rolecard .arr{color:var(--t3);font-size:18px}
+
+/* ===== runner add-item builder ===== */
+.seg{display:flex;gap:4px;background:var(--glass-soft);-webkit-backdrop-filter:var(--blur-lite);backdrop-filter:var(--blur-lite);border:1px solid var(--glass-brd);box-shadow:var(--glass-hi);border-radius:15px;padding:4px;margin-bottom:14px}
+.seg button{flex:1;border:0;background:transparent;color:var(--t2);font-family:var(--body);font-weight:700;font-size:12.5px;padding:10px 6px;border-radius:11px;cursor:pointer;transition:.2s var(--spring);white-space:nowrap}
+.seg button:active{transform:scale(.95)}
+.seg button.on{background:var(--acc-soft);border:1px solid var(--acc-line);color:var(--acc);box-shadow:inset 0 1px 0 rgba(255,255,255,.12)}
+.catchips{display:flex;gap:7px;margin-bottom:13px;flex-wrap:wrap}
+.goods{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.goodcard{position:relative;background:var(--glass-soft);-webkit-backdrop-filter:var(--blur-lite);backdrop-filter:var(--blur-lite);border:1px solid var(--glass-brd);box-shadow:var(--glass-hi);border-radius:16px;padding:13px 6px 11px;text-align:center;cursor:pointer;transition:transform .15s var(--spring),border-color .2s,background .2s;overflow:hidden}
+.goodcard::before{content:"";position:absolute;top:0;left:0;right:0;height:40%;background:linear-gradient(180deg,rgba(255,255,255,.05),transparent);pointer-events:none}
+.goodcard:active{transform:scale(.92)}
+.goodcard.on{border-color:var(--acc-line);background:var(--acc-soft)}
+.goodcard .ge{font-size:27px;line-height:1}
+.goodcard .gn{font-size:11.5px;font-weight:700;margin-top:7px;line-height:1.15;letter-spacing:-.01em}
+.goodcard .gp{font-family:var(--mono);font-size:11px;color:var(--gold);margin-top:4px}
+.goodcard .gbadge{position:absolute;top:6px;right:6px;min-width:19px;height:19px;border-radius:10px;background:var(--acc);color:#1a120a;font-family:var(--mono);font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 4px;opacity:0;transform:scale(.4);transition:.22s var(--spring)}
+.goodcard.on .gbadge{opacity:1;transform:scale(1)}
+.emojirow{display:flex;gap:7px;flex-wrap:wrap}
+.emojibtn{width:44px;height:44px;border-radius:13px;background:var(--glass-soft);border:1px solid var(--glass-brd);box-shadow:var(--glass-hi);font-size:22px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.15s var(--spring)}
+.emojibtn:active{transform:scale(.88)}
+.emojibtn.on{border-color:var(--acc);background:var(--acc-soft);transform:scale(1.06);box-shadow:0 0 0 1px var(--acc),var(--glass-hi)}
+.pricechips{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px}
+.pricechip{font-family:var(--mono);font-size:12.5px;font-weight:700;padding:9px 13px;border-radius:11px;border:1px solid var(--glass-brd);background:var(--glass-soft);color:var(--t2);cursor:pointer;transition:.15s var(--spring)}
+.pricechip:active{transform:scale(.92);border-color:var(--acc-line);color:var(--acc)}
 </style>
 </head>
 <body>
@@ -594,6 +618,14 @@ const PACKS=[
  {s:500,d:{ru:'50 доставок · 48ч',en:'50 deliveries · 48h'},usd:'≈ $10',hot:true},
  {s:1000,d:{ru:'130 доставок · 72ч',en:'130 deliveries · 72h'},usd:'≈ $20'},
 ];
+/* runner add-item catalog [emoji, ru, en, price] */
+const GOODS={
+ drink:[['💧','Вода 0.5 л','Water 0.5L',80],['💧','Вода 1 л','Water 1L',110],['☕','Кофе','Coffee',180],['☕','Капучино','Cappuccino',190],['🥤','Кола','Cola',120],['⚡','Энергетик','Energy drink',150],['🧃','Сок','Juice',130],['🫖','Чай','Tea',120]],
+ food:[['🌯','Шаверма','Shawarma',320],['🥪','Сэндвич','Sandwich',220],['🍔','Бургер','Burger',350],['🌭','Хот-дог','Hot dog',160],['🥐','Круассан','Croissant',140],['🍌','Банан','Banana',60],['🍫','Шоколад','Chocolate',95],['🍦','Мороженое','Ice cream',120],['🍜','Лапша б/п','Instant noodles',130]],
+ other:[['🔋','Пауэрбанк','Power bank',200],['🔌','Зарядка','Charger',200],['🧻','Салфетки','Wet wipes',90],['🧴','Антисептик','Sanitizer',110],['☂️','Дождевик','Raincoat',150],['🩹','Пластырь','Plaster',70]],
+};
+const CATS=[['drink','Напитки','Drinks'],['food','Еда','Food'],['other','Прочее','Other']];
+const EMOJI_PICK=['💧','☕','🥤','⚡','🧃','🌯','🥪','🍔','🌭','🥐','🍌','🍫','🍦','🍜','🔋','🔌','🧻','🧴','☂️','🩹','🛍️'];
 
 /* ============ state ============ */
 const S={
@@ -606,6 +638,7 @@ const S={
    {me:false,tx:{ru:'Принял, иду. 8 минут 🏃',en:'Got it, on my way. 8 min 🏃'},tm:'14:03'},
  ]},
  reviewStars:5, history:[], queue:'loc', dir:0, radarSeen:false,
+ addTab:'cat', addCat:'drink', addCount:0, addedMap:{}, addEmoji:'🛍️', prefillName:'',
 };
 const rname=r=>S.lang==='en'?(r.nameEn||r.name):r.name;
 const cartCount=()=>Object.values(S.cart).reduce((a,b)=>a+b,0);
@@ -948,17 +981,62 @@ function scrStore(){
 }
 function toggleOnline(){ haptic('medium'); S.storeOpen=!S.storeOpen; renderScreen(); toast(I.zap, S.storeOpen?(S.lang==='ru'?'Ты на линии — заказы пошли':'You are online — orders incoming'):(S.lang==='ru'?'Ты не на линии':'You are offline')); }
 function addItemSheet(){
- haptic('light');
- const body=`
-  <div class="sheet-h"><div class="h2">${t('addItem')}</div></div>
-  <div class="field"><label>${t('itemName')}</label><input id="niName" placeholder="${S.lang==='ru'?'Кола 0.5, лёд':'Cola 0.5, ice'}" value="🥤 Кола 0.5"></div>
-  <div class="field"><label>${t('setPrice')}</label><input id="niPrice" type="number" placeholder="120" value="120"></div>
-  <div class="card" style="margin-bottom:14px"><div class="mono" style="font-size:10.5px;color:var(--t3);line-height:1.5">${S.lang==='ru'?'Цену ставишь сам — это твой рынок. Платформа не ограничивает наценку. Товар оплачивается P2P.':'You set the price — it is your market. The platform sets no cap. Goods are paid P2P.'}</div></div>
-  <button class="btn primary" onclick="saveItem()">${I.check} ${t('save')}</button>`;
- openSheet(body);
+ haptic('light'); S.addTab='cat'; S.addCat='drink'; S.addCount=0; S.addedMap={}; S.addEmoji='🛍️'; S.prefillName='';
+ openSheet(`
+  <div class="sheet-h"><div class="h2">${S.lang==='ru'?'Добавить товары':'Add items'}</div></div>
+  <div class="seg" id="addSeg">
+    <button class="on" onclick="setAddTab('cat',this)">${S.lang==='ru'?'Каталог':'Catalog'}</button>
+    <button onclick="setAddTab('req',this)">🔥 ${S.lang==='ru'?'Запросы':'Demand'}</button>
+    <button onclick="setAddTab('custom',this)">${S.lang==='ru'?'Своё':'Custom'}</button>
+  </div>
+  <div id="addRoot"></div>
+  <div id="addFooter" style="position:sticky;bottom:0;padding:10px 0 2px;background:linear-gradient(180deg,transparent,rgba(22,18,16,.92) 45%)"></div>
+ `);
+ repaintAdd(); updateAddFooter();
 }
-function saveItem(){ haptic('success'); const nm=document.getElementById('niName')?.value||'Новый товар'; const p=+document.getElementById('niPrice')?.value||100;
- const em=nm.match(/\p{Emoji}/u)?.[0]||'🛍️'; RUNNERS[0].items.unshift({e:em,n:nm.replace(/\p{Emoji}/u,'').trim(),ne:nm.replace(/\p{Emoji}/u,'').trim(),sub:'',p}); closeSheet(); toast(I.check,t('itemAdded')); setTimeout(renderScreen,300); }
+function setAddTab(tab,el){ haptic('light'); S.addTab=tab; document.querySelectorAll('#addSeg button').forEach(b=>b.classList.remove('on')); if(el)el.classList.add('on'); repaintAdd(); }
+function setAddCat(c){ haptic('light'); S.addCat=c; repaintAdd(); }
+function repaintAdd(){ const root=document.getElementById('addRoot'); if(!root)return; root.innerHTML = S.addTab==='cat'?addCatView():(S.addTab==='req'?addReqView():addCustomView()); }
+function addCatView(){
+ const chips=CATS.map(([k,ru,en])=>`<button class="chip-sel ${S.addCat===k?'on':''}" onclick="setAddCat('${k}')">${S.lang==='en'?en:ru}</button>`).join('');
+ const cards=(GOODS[S.addCat]||[]).map((g,i)=>{const key=S.addCat+'_'+i;const c=S.addedMap[key]||0;return `<div class="goodcard ${c?'on':''}" id="gc_${key}" onclick="quickAdd('${S.addCat}',${i})"><div class="gbadge">${c?'×'+c:''}</div><div class="ge">${g[0]}</div><div class="gn">${S.lang==='en'?g[2]:g[1]}</div><div class="gp">${g[3]} ₽</div></div>`;}).join('');
+ return `<div class="catchips">${chips}</div><div class="goods">${cards}</div><div class="mono faint" style="font-size:10.5px;text-align:center;margin-top:13px;line-height:1.5">${S.lang==='ru'?'Тапни — товар сразу в витрине. Цену меняешь тапом по товару в списке.':'Tap — item goes straight to your store. Change price by tapping it in the list.'}</div>`;
+}
+function quickAdd(cat,i){
+ haptic('success'); const g=GOODS[cat][i]; const key=cat+'_'+i;
+ RUNNERS[0].items.unshift({e:g[0],n:g[1],ne:g[2],sub:'',p:g[3]});
+ S.addedMap[key]=(S.addedMap[key]||0)+1; S.addCount++;
+ const card=document.getElementById('gc_'+key);
+ if(card){ card.classList.add('on'); const b=card.querySelector('.gbadge'); if(b)b.textContent='×'+S.addedMap[key]; card.style.transform='scale(1.07)'; setTimeout(()=>{ if(card)card.style.transform=''; },150); }
+ updateAddFooter();
+}
+function addReqView(){
+ return `<p class="muted" style="font-size:13px;line-height:1.5;margin-bottom:12px">${S.lang==='ru'?'Водители рядом уже это просят. Добавь — попадёшь точно в спрос.':'Drivers nearby are already asking for this. Add it — hit the demand.'}</p>`+
+  REQ_FEED.map((q,i)=>`<div class="item" style="cursor:pointer" onclick="addFromReq(${i})"><div class="ic">🔥</div><div style="flex:1"><div class="nm" style="font-size:13.5px">${S.lang==='en'?q.txtEn:q.txt}</div><div class="sub">${S.lang==='en'?q.whoEn:q.who} · ${S.lang==='en'?q.agoEn:q.ago}</div></div><div class="addbtn">+</div></div>`).join('');
+}
+function addFromReq(i){ haptic('medium'); S.prefillName=(S.lang==='en'?REQ_FEED[i].txtEn:REQ_FEED[i].txt); S.addTab='custom'; document.querySelectorAll('#addSeg button').forEach((b,bi)=>b.classList.toggle('on',bi===2)); repaintAdd(); }
+function addCustomView(){
+ const emojis=EMOJI_PICK.map(e=>`<div class="emojibtn ${S.addEmoji===e?'on':''}" onclick="pickEmoji('${e}')">${e}</div>`).join('');
+ const prices=[60,90,120,150,200,300].map(p=>`<div class="pricechip" onclick="document.getElementById('ciPrice').value=${p}">${p} ₽</div>`).join('');
+ return `
+  <div class="field"><label>${S.lang==='ru'?'Иконка':'Icon'}</label><div class="emojirow">${emojis}</div></div>
+  <div class="field"><label>${t('itemName')}</label><input id="ciName" placeholder="${S.lang==='ru'?'Напр. Лимонад домашний':'e.g. Homemade lemonade'}" value="${(S.prefillName||'').replace(/"/g,'&quot;')}"></div>
+  <div class="field"><label>${t('setPrice')}</label><input id="ciPrice" type="number" inputmode="numeric" placeholder="120"><div class="pricechips">${prices}</div></div>
+  <button class="btn primary" onclick="saveCustom()">${I.plus} ${S.lang==='ru'?'Добавить в витрину':'Add to store'}</button>
+  <div class="mono faint" style="font-size:10px;text-align:center;margin-top:12px;line-height:1.5">${S.lang==='ru'?'Цену ставишь сам — платформа наценку не ограничивает. Товар P2P.':'You set the price — no cap. Goods are P2P.'}</div>`;
+}
+function pickEmoji(e){ haptic('light'); S.addEmoji=e; document.querySelectorAll('.emojibtn').forEach(b=>b.classList.toggle('on',b.textContent===e)); }
+function saveCustom(){
+ const nm=document.getElementById('ciName')?.value?.trim(); const p=+document.getElementById('ciPrice')?.value||0;
+ if(!nm){ haptic('warning'); toast(I.info,S.lang==='ru'?'Впиши название':'Enter a name'); return; }
+ haptic('success'); RUNNERS[0].items.unshift({e:S.addEmoji||'🛍️',n:nm,ne:nm,sub:'',p:p||100}); S.addCount++; S.prefillName='';
+ toast(I.check,t('itemAdded')); const ci=document.getElementById('ciName'); if(ci)ci.value=''; const cp=document.getElementById('ciPrice'); if(cp)cp.value=''; updateAddFooter();
+}
+function updateAddFooter(){
+ const f=document.getElementById('addFooter'); if(!f)return;
+ f.innerHTML=`<button class="btn ${S.addCount?'primary':'sec'}" onclick="finishAdd()">${S.addCount?`${I.check} ${S.lang==='ru'?'Готово':'Done'} · ${S.addCount} ${S.lang==='ru'?'добавлено':'added'}`:(S.lang==='ru'?'Закрыть':'Close')}</button>`;
+}
+function finishAdd(){ haptic('medium'); const n=S.addCount; closeSheet(); if(n)toast(I.check, `${n} ${S.lang==='ru'?(n===1?'товар в витрине':'товаров в витрине'):'items in store'}`); setTimeout(renderScreen,250); }
 function scrFeed(){
  return `
   <div class="eyebrow"><i></i>${t('feed')}</div>
