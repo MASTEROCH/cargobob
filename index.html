@@ -1,0 +1,1127 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#161210">
+<title>КаргоБоб</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Hanken+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#161210; --ink2:#1d1814; --ink3:#27201a; --ink4:#332a22;
+  --amber:#ff7a18; --amber-d:#d9610c; --gold:#f5a524; --mint:#57e0c8; --mint-d:#1f9f8c; --rose:#ff5d6c;
+  --t1:#f7f1e8; --t2:#cabfb0; --t3:#94877a; --line:rgba(247,241,232,.10); --line2:rgba(247,241,232,.16);
+  --disp:'Bricolage Grotesque',sans-serif; --body:'Hanken Grotesk','SF Pro Rounded',sans-serif; --mono:'JetBrains Mono',monospace;
+  --r-card:22px; --r-sheet:30px; --r-btn:17px; --r-pill:40px;
+  --ease:cubic-bezier(.2,.7,.2,1); --spring:cubic-bezier(.34,1.4,.5,1); --smooth:cubic-bezier(.2,.9,.25,1);
+  --acc:var(--amber); --acc-d:var(--amber-d); --acc-rgb:255,122,24; --acc-soft:rgba(255,122,24,.15); --acc-line:rgba(255,122,24,.34);
+  /* liquid glass */
+  --glass: linear-gradient(180deg, rgba(247,241,232,.085), rgba(247,241,232,.022));
+  --glass-soft: linear-gradient(180deg, rgba(247,241,232,.06), rgba(247,241,232,.015));
+  --glass-brd: rgba(247,241,232,.15);
+  --glass-hi: inset 0 1px 0 rgba(255,255,255,.20);
+  --glass-lo: inset 0 -1px 0 rgba(0,0,0,.22);
+  --glass-sh: 0 14px 42px rgba(0,0,0,.42);
+  --blur: blur(28px) saturate(185%) brightness(1.06);
+  --blur-lite: blur(18px) saturate(160%) brightness(1.04);
+  --deep: linear-gradient(180deg, rgba(39,32,26,.66), rgba(22,18,16,.78));
+  --safe-t:env(safe-area-inset-top,0px); --safe-b:env(safe-area-inset-bottom,0px);
+}
+body.runner{ --acc:var(--mint); --acc-d:var(--mint-d); --acc-rgb:87,224,200; --acc-soft:rgba(87,224,200,.14); --acc-line:rgba(87,224,200,.34); }
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{font-family:var(--body); color:var(--t1); background:#0b0908; -webkit-font-smoothing:antialiased; overflow:hidden; user-select:none; display:flex; align-items:center; justify-content:center; letter-spacing:-.01em}
+
+/* ===== device frame ===== */
+#stage{width:100%;height:100%;display:flex;align-items:center;justify-content:center;position:relative}
+#stage::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(800px 600px at 78% 0%, rgba(255,122,24,.08), transparent 60%),radial-gradient(700px 560px at 16% 100%, rgba(87,224,200,.06), transparent 60%)}
+.phone{position:relative;width:100%;height:100%;background:radial-gradient(150% 100% at 50% -8%, #221a14, #130f0c 60%);overflow:hidden}
+@media(min-width:560px){
+  :root{--safe-t:32px;--safe-b:18px}
+  .phone{width:412px;height:880px;max-height:96vh;border-radius:52px;box-shadow:0 50px 130px rgba(0,0,0,.65),0 0 0 12px #0a0806,0 0 0 13px #2a221c, inset 0 0 0 1px rgba(247,241,232,.06)}
+  .phone::after{content:"";position:absolute;top:0;left:50%;transform:translateX(-50%);width:118px;height:30px;background:#0a0806;border-radius:0 0 18px 18px;z-index:70}
+}
+
+/* ===== ambient aurora orbs (liquid glass needs something to refract) ===== */
+.aurora{position:absolute;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+.orb{position:absolute;border-radius:50%;filter:blur(74px);opacity:.55;will-change:transform,filter}
+.orb.o1{width:300px;height:300px;background:#ff7a18;top:-60px;left:-40px;animation:drift1 26s ease-in-out infinite, breath 9s ease-in-out infinite alternate}
+.orb.o2{width:260px;height:260px;background:#f5a524;top:8%;right:-70px;opacity:.4;animation:drift2 30s ease-in-out infinite, breath 11s ease-in-out infinite alternate}
+.orb.o3{width:320px;height:320px;background:#57e0c8;bottom:-40px;left:-30px;opacity:.34;animation:drift3 34s ease-in-out infinite, breath 12s ease-in-out infinite alternate}
+.orb.o4{width:220px;height:220px;background:#ff5d6c;bottom:14%;right:-50px;opacity:.16;animation:drift4 28s ease-in-out infinite}
+@keyframes drift1{0%,100%{transform:translate(0,0)}33%{transform:translate(40px,60px)}66%{transform:translate(20px,30px)}}
+@keyframes drift2{0%,100%{transform:translate(0,0)}33%{transform:translate(-50px,40px)}66%{transform:translate(-20px,80px)}}
+@keyframes drift3{0%,100%{transform:translate(0,0)}33%{transform:translate(60px,-30px)}66%{transform:translate(30px,-60px)}}
+@keyframes drift4{0%,100%{transform:translate(0,0)}50%{transform:translate(-40px,-40px)}}
+@keyframes breath{from{filter:blur(74px)}to{filter:blur(92px)}}
+.grain{position:absolute;inset:0;z-index:1;pointer-events:none;opacity:.045;mix-blend-mode:overlay;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+
+/* ===== glass primitives ===== */
+.glass{position:relative;background:var(--glass);-webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur);border:1px solid var(--glass-brd);box-shadow:var(--glass-hi),var(--glass-lo),var(--glass-sh);isolation:isolate;overflow:hidden}
+.glass::before{content:"";position:absolute;top:0;left:0;right:0;height:46%;background:linear-gradient(180deg,rgba(255,255,255,.07),transparent);pointer-events:none;border-radius:inherit;z-index:0}
+.glass>*{position:relative;z-index:1}
+
+/* ===== app shell ===== */
+.app{position:absolute;inset:0;z-index:3;display:flex;flex-direction:column;background:transparent}
+.scroll{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.scroll::-webkit-scrollbar{display:none}
+.pad{padding:8px 16px calc(132px + var(--safe-b))}
+.pad.fade>*{animation:rise .5s var(--smooth) backwards}
+.pad.fade>*:nth-child(1){animation-delay:.02s}.pad.fade>*:nth-child(2){animation-delay:.06s}.pad.fade>*:nth-child(3){animation-delay:.10s}.pad.fade>*:nth-child(4){animation-delay:.14s}.pad.fade>*:nth-child(5){animation-delay:.18s}.pad.fade>*:nth-child(n+6){animation-delay:.22s}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}}
+.pad.sl-f{animation:slF .36s var(--smooth)}
+.pad.sl-b{animation:slB .36s var(--smooth)}
+@keyframes slF{from{opacity:.4;transform:translateX(26px)}}
+@keyframes slB{from{opacity:.4;transform:translateX(-26px)}}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+.radar-scan{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;animation:rise .3s var(--ease)}
+.rs-ring{width:46px;height:46px;border-radius:50%;border:3px solid rgba(255,122,24,.18);border-top-color:var(--amber);animation:spin360 .85s linear infinite}
+@keyframes spin360{to{transform:rotate(360deg)}}
+.rs-txt{font-family:var(--mono);font-size:11px;color:var(--t3);letter-spacing:.5px}
+
+/* top bar */
+.top{position:relative;z-index:6;padding:max(calc(var(--safe-t) + 10px), 16px) 16px 8px;display:flex;align-items:center;gap:12px;justify-content:space-between}
+.brand{display:flex;align-items:center;gap:10px}
+.logo{width:36px;height:36px;border-radius:12px;background:linear-gradient(150deg,var(--amber),var(--gold));display:flex;align-items:center;justify-content:center;flex:none;box-shadow:0 6px 18px rgba(255,122,24,.4), inset 0 1px 0 rgba(255,255,255,.4);position:relative}
+.logo::after{content:"";position:absolute;top:3px;left:5px;right:5px;height:38%;border-radius:8px;background:linear-gradient(180deg,rgba(255,255,255,.5),transparent)}
+.logo svg{width:20px;height:20px;position:relative;z-index:1}
+.brand .nm{font-family:var(--disp);font-weight:800;font-size:19px;letter-spacing:-.02em;line-height:1}
+.brand .sb{font-family:var(--mono);font-size:9px;letter-spacing:1.5px;color:var(--t3);text-transform:uppercase;margin-top:3px}
+.top-act{display:flex;align-items:center;gap:8px}
+.icon-btn{width:40px;height:40px;border-radius:14px;background:var(--glass);-webkit-backdrop-filter:var(--blur-lite);backdrop-filter:var(--blur-lite);border:1px solid var(--glass-brd);box-shadow:var(--glass-hi);color:var(--t1);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.2s var(--spring)}
+.icon-btn:active{transform:scale(.9)}
+.icon-btn svg{width:18px;height:18px}
+.lang{font-family:var(--mono);font-size:11px;font-weight:700}
+
+/* role segmented */
+.roleseg{display:flex;gap:4px;background:var(--glass-soft);-webkit-backdrop-filter:var(--blur-lite);backdrop-filter:var(--blur-lite);border:1px solid var(--glass-brd);box-shadow:var(--glass-hi);border-radius:var(--r-pill);padding:5px;position:relative}
+.roleseg button{flex:1;border:0;background:transparent;color:var(--t2);font-family:var(--body);font-weight:700;font-size:13px;padding:9px 10px;border-radius:var(--r-pill);cursor:pointer;transition:.25s;display:flex;align-items:center;justify-content:center;gap:6px;z-index:2}
+.roleseg button.on{color:var(--ink)}
+.roleseg .glide{position:absolute;top:5px;bottom:5px;width:calc(50% - 5px);border-radius:var(--r-pill);background:linear-gradient(150deg,var(--amber),var(--gold));transition:.35s var(--spring);z-index:1;box-shadow:0 6px 16px rgba(255,122,24,.35), inset 0 1px 0 rgba(255,255,255,.4)}
+body.runner .roleseg .glide{background:linear-gradient(150deg,var(--mint),var(--mint-d));box-shadow:0 6px 16px rgba(87,224,200,.32), inset 0 1px 0 rgba(255,255,255,.4);transform:translateX(calc(100% + 5px))}
+.roleseg button svg{width:15px;height:15px}
+
+/* headings */
+.eyebrow{font-family:var(--mono);font-size:10.5px;font-weight:500;letter-spacing:2.5px;text-transform:uppercase;color:var(--acc);display:flex;align-items:center;gap:9px;margin:6px 0 10px}
+.eyebrow i{width:18px;height:1px;background:var(--acc);opacity:.55}
+.h1{font-family:var(--disp);font-weight:800;font-size:27px;line-height:1.06;letter-spacing:-.03em}
+.h1 .a{color:var(--acc)}
+.h2{font-family:var(--disp);font-weight:700;font-size:18px;letter-spacing:-.02em}
+.muted{color:var(--t2)} .faint{color:var(--t3)}
+.sec-t{font-family:var(--mono);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--t3);display:flex;align-items:center;justify-content:space-between;margin:22px 2px 12px}
+.sec-t .more{color:var(--acc);font-weight:700;cursor:pointer}
+
+/* card / glass surfaces */
+.card{position:relative;background:var(--glass);-webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur);border:1px solid var(--glass-brd);box-shadow:var(--glass-hi),var(--glass-lo),var(--glass-sh);border-radius:var(--r-card);padding:16px;overflow:hidden;isolation:isolate}
+.card::before{content:"";position:absolute;top:0;left:0;right:0;height:42%;background:linear-gradient(180deg,rgba(255,255,255,.06),transparent);pointer-events:none;border-radius:inherit;z-index:0}
+.card>*{position:relative;z-index:1}
+.card.acc{border-color:var(--acc-line);box-shadow:var(--glass-hi),var(--glass-lo),0 14px 42px rgba(var(--acc-rgb),.14)}
+.card.acc::after{content:"";position:absolute;inset:0;background:linear-gradient(150deg,var(--acc-soft),transparent 60%);z-index:0;pointer-events:none}
+.mono{font-family:var(--mono)}
+.tag{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:10px;letter-spacing:.5px;text-transform:uppercase;padding:5px 10px;border-radius:30px;border:1px solid var(--acc-line);color:var(--acc);background:var(--acc-soft);font-weight:700}
+.tag.warn{color:var(--gold);border-color:rgba(245,165,36,.32);background:rgba(245,165,36,.12)}
+.tag.neutral{color:var(--t2);border-color:var(--glass-brd);background:rgba(247,241,232,.05)}
+
+/* buttons */
+.btn{position:relative;display:flex;align-items:center;justify-content:center;gap:9px;border:0;cursor:pointer;font-family:var(--body);font-weight:800;font-size:16px;padding:16px 18px;border-radius:var(--r-btn);transition:.18s var(--spring);width:100%;overflow:hidden;letter-spacing:-.01em}
+.btn:active{transform:scale(.97)}
+.btn svg{width:18px;height:18px}
+.btn.primary{background:linear-gradient(150deg,var(--amber),var(--gold));color:#1a120a;box-shadow:0 10px 26px rgba(255,122,24,.34), inset 0 1px 0 rgba(255,255,255,.45)}
+body.runner .btn.primary{background:linear-gradient(150deg,var(--mint),var(--mint-d));color:#0a1815;box-shadow:0 10px 26px rgba(87,224,200,.3), inset 0 1px 0 rgba(255,255,255,.45)}
+.btn.primary::after{content:"";position:absolute;top:0;left:0;right:0;height:48%;background:linear-gradient(180deg,rgba(255,255,255,.35),transparent);pointer-events:none}
+.btn.primary::before{content:"";position:absolute;top:0;bottom:0;left:-60%;width:36%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.5),transparent);transform:skewX(-18deg);pointer-events:none;animation:ctaShine 4.2s ease-in-out 1.2s infinite}
+@keyframes ctaShine{0%{left:-60%}24%,100%{left:170%}}
+.btn.sec{background:var(--glass);-webkit-backdrop-filter:var(--blur-lite);backdrop-filter:var(--blur-lite);color:var(--t1);border:1px solid var(--glass-brd);box-shadow:var(--glass-hi)}
+.btn.ghost{background:var(--acc-soft);color:var(--acc);border:1px solid var(--acc-line);-webkit-backdrop-filter:var(--blur-lite);backdrop-filter:var(--blur-lite)}
+.btn.danger{background:rgba(255,93,108,.14);color:var(--rose);border:1px solid rgba(255,93,108,.34)}
+.btn.sm{padding:11px 15px;font-size:14px;width:auto}
+.btn.block{width:100%}
+.btn:disabled{opacity:.4;pointer-events:none}
+
+/* runner row */
+.runner{position:relative;display:flex;gap:13px;align-items:center;padding:14px;background:var(--glass-soft);-webkit-backdrop-filter:var(--blur-lite);backdrop-filter:var(--blur-lite);border:1px solid var(--glass-brd);box-shadow:var(--glass-hi);border-radius:var(--r-card);cursor:pointer;transition:.22s var(--spring);overflow:hidden;isolation:isolate}
+.runner::before{content:"";position:absolute;top:0;left:0;right:0;height:40%;background:linear-gradient(180deg,rgba(255,255,255,.05),transparent);pointer-events:none}
+.runner:active{transform:scale(.985);border-color:var(--acc-line)}
+.runner>*{position:relative;z-index:1}
+.av{width:50px;height:50px;border-radius:16px;flex:none;display:flex;align-items:center;justify-content:center;font-family:var(--disp);font-weight:800;font-size:22px;color:#1a120a;position:relative;box-shadow:inset 0 1px 0 rgba(255,255,255,.45), 0 4px 12px rgba(0,0,0,.3)}
+.av::after{content:"";position:absolute;top:3px;left:6px;right:6px;height:34%;border-radius:10px;background:linear-gradient(180deg,rgba(255,255,255,.4),transparent)}
+.av .on-dot{position:absolute;right:-2px;bottom:-2px;width:14px;height:14px;border-radius:50%;background:var(--mint);border:3px solid var(--ink);z-index:2;box-shadow:0 0 8px var(--mint)}
+.runner .info{flex:1;min-width:0}
+.runner .nm{font-weight:800;font-size:15.5px;display:flex;align-items:center;gap:7px;letter-spacing:-.02em}
+.runner .meta{font-family:var(--mono);font-size:11.5px;color:var(--t3);margin-top:4px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.stars-i{color:var(--gold);letter-spacing:1px}
+.runner .right{text-align:right;flex:none}
+.runner .eta{font-family:var(--mono);font-weight:700;font-size:14px;color:var(--acc)}
+.runner .dist{font-family:var(--mono);font-size:10.5px;color:var(--t3);margin-top:3px}
+.qrbadge{display:inline-flex;align-items:center;gap:3px;font-family:var(--mono);font-size:9px;color:var(--mint);background:rgba(87,224,200,.12);border:1px solid rgba(87,224,200,.28);padding:2px 7px;border-radius:20px;font-weight:700}
+.qrbadge svg{width:9px;height:9px}
+.newbadge{font-family:var(--mono);font-size:9px;color:var(--gold);background:rgba(245,165,36,.12);border:1px solid rgba(245,165,36,.28);padding:2px 7px;border-radius:20px;font-weight:700}
+
+/* quick-order hero */
+.qhero{position:relative;border-radius:var(--r-card);overflow:hidden;cursor:pointer;transition:.22s var(--spring);background:linear-gradient(150deg,rgba(255,122,24,.18),rgba(245,165,36,.06));-webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur);border:1px solid var(--acc-line);box-shadow:var(--glass-hi),0 14px 42px rgba(var(--acc-rgb),.16);padding:17px;isolation:isolate}
+.qhero::before{content:"";position:absolute;top:0;left:0;right:0;height:50%;background:linear-gradient(180deg,rgba(255,255,255,.08),transparent);pointer-events:none}
+.qhero:active{transform:scale(.99)}
+.qhero>*{position:relative;z-index:1}
+.qhero .qrow{display:flex;align-items:center;gap:12px}
+.qhero .qicon{width:42px;height:42px;border-radius:13px;background:rgba(var(--acc-rgb),.2);border:1px solid var(--acc-line);display:flex;align-items:center;justify-content:center;color:var(--acc);flex:none}
+.qhero .qicon svg{width:21px;height:21px}
+.qhero .qt{font-family:var(--disp);font-weight:700;font-size:16px;letter-spacing:-.02em}
+.qhero .qs{font-size:12.5px;color:var(--t2);margin-top:2px}
+.qhero .qchips{display:flex;gap:7px;flex-wrap:wrap;margin-top:13px}
+.qhero .qc{font-family:var(--mono);font-size:11px;color:var(--t2);background:rgba(247,241,232,.06);border:1px solid var(--glass-brd);padding:6px 11px;border-radius:20px;font-weight:600}
+
+/* location chip */
+.loc-chip{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;font-weight:600;color:var(--t1);background:var(--glass-soft);-webkit-backdrop-filter:var(--blur-lite);backdrop-filter:var(--blur-lite);border:1px solid var(--glass-brd);box-shadow:var(--glass-hi);padding:8px 13px;border-radius:30px}
+.loc-chip svg{width:14px;height:14px;color:var(--amber)}
+.loc-chip .ch{color:var(--t3);font-family:var(--mono);font-size:10.5px}
+
+/* ===== RADAR ===== */
+.radar-wrap{position:relative;margin:4px 0;border-radius:24px;overflow:hidden;background:radial-gradient(120% 90% at 50% 0%, rgba(255,122,24,.10), transparent 55%),var(--glass-soft);-webkit-backdrop-filter:var(--blur-lite);backdrop-filter:var(--blur-lite);border:1px solid var(--glass-brd);box-shadow:var(--glass-hi),var(--glass-lo);height:300px;isolation:isolate}
+.radar{position:absolute;inset:0}
+.ring{position:absolute;left:50%;top:50%;border-radius:50%;border:1px solid rgba(247,241,232,.09);transform:translate(-50%,-50%)}
+.ring.r1{width:90px;height:90px}.ring.r2{width:180px;height:180px}.ring.r3{width:280px;height:280px;border-style:dashed;border-color:rgba(255,122,24,.2)}
+.ring-lbl{position:absolute;left:50%;top:calc(50% - 140px);transform:translateX(-50%);font-family:var(--mono);font-size:9px;letter-spacing:1px;color:var(--t3);background:rgba(11,9,8,.5);padding:2px 8px;border-radius:10px;border:1px solid var(--line)}
+.sweep{position:absolute;left:50%;top:50%;width:280px;height:280px;transform:translate(-50%,-50%);border-radius:50%;background:conic-gradient(from 0deg, rgba(255,122,24,.24), transparent 28%);animation:spin 4.5s linear infinite;pointer-events:none}
+@keyframes spin{to{transform:translate(-50%,-50%) rotate(360deg)}}
+.me{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:4;display:flex;flex-direction:column;align-items:center;gap:5px}
+.me .car{width:44px;height:44px;border-radius:14px;background:linear-gradient(150deg,#3a2e22,#27201a);border:1px solid var(--gold);display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 6px rgba(245,165,36,.08),0 0 28px rgba(245,165,36,.3), inset 0 1px 0 rgba(255,255,255,.2)}
+.me .car svg{width:24px;height:24px;color:var(--gold)}
+.me .pulse{position:absolute;width:44px;height:44px;border-radius:50%;border:1.5px solid var(--gold);animation:pulse 2.6s ease-out infinite;top:0}
+@keyframes pulse{0%{transform:scale(1);opacity:.7}100%{transform:scale(3.6);opacity:0}}
+.me .lbl{font-family:var(--mono);font-size:9px;color:var(--gold);letter-spacing:1px;background:rgba(11,9,8,.5);padding:2px 9px;border-radius:10px;border:1px solid rgba(245,165,36,.28)}
+.pin{position:absolute;z-index:5;display:flex;flex-direction:column;align-items:center;cursor:pointer;transition:.3s var(--spring);animation:pop .5s var(--spring) backwards}
+.pin:active{transform:scale(.9)}
+@keyframes pop{from{opacity:0;transform:scale(0)}}
+.pin .av{width:40px;height:40px;font-size:17px;border:2px solid rgba(11,9,8,.5);box-shadow:0 5px 16px rgba(0,0,0,.45)}
+.pin .pp{font-family:var(--mono);font-size:9px;font-weight:700;color:var(--t1);background:rgba(11,9,8,.66);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border:1px solid var(--line2);padding:2px 7px;border-radius:9px;margin-top:5px;white-space:nowrap;box-shadow:0 3px 8px rgba(0,0,0,.4)}
+.pin .pp b{color:var(--acc)}
+.radar-foot{position:absolute;left:12px;bottom:12px;right:12px;display:flex;justify-content:space-between;align-items:center;z-index:6}
+.live{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10px;color:var(--mint);background:rgba(11,9,8,.55);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border:1px solid rgba(87,224,200,.22);padding:6px 11px;border-radius:20px;font-weight:700}
+.live .dot{width:6px;height:6px;border-radius:50%;background:var(--mint);animation:blink 1.6s ease-in-out infinite;box-shadow:0 0 8px var(--mint)}
+@keyframes blink{50%{opacity:.3}}
+.viewtoggle{display:flex;gap:3px;background:rgba(11,9,8,.5);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:20px;padding:3px}
+.viewtoggle button{border:0;background:transparent;color:var(--t3);width:32px;height:28px;border-radius:16px;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.viewtoggle button.on{background:var(--acc);color:#1a120a}
+.viewtoggle svg{width:15px;height:15px}
+
+/* listing item */
+.item{position:relative;display:flex;gap:12px;align-items:center;padding:12px 13px;background:var(--glass-soft);-webkit-backdrop-filter:var(--blur-lite);backdrop-filter:var(--blur-lite);border:1px solid var(--glass-brd);box-shadow:var(--glass-hi);border-radius:16px;margin-bottom:9px;overflow:hidden}
+.item .ic{width:44px;height:44px;border-radius:13px;background:rgba(247,241,232,.05);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:23px;flex:none}
+.item .nm{font-weight:700;font-size:14.5px;letter-spacing:-.01em}
+.item .sub{font-family:var(--mono);font-size:11px;color:var(--t3);margin-top:2px}
+.item .price{font-family:var(--mono);font-weight:700;font-size:15px;color:var(--gold)}
+.stepper{display:flex;align-items:center;gap:0;background:rgba(247,241,232,.06);border:1px solid var(--line2);border-radius:12px;overflow:hidden}
+.stepper button{width:34px;height:34px;border:0;background:transparent;color:var(--acc);font-size:19px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.stepper button:active{background:var(--acc-soft)}
+.stepper .q{width:26px;text-align:center;font-family:var(--mono);font-weight:700;font-size:14px}
+.addbtn{width:34px;height:34px;border-radius:11px;border:1px solid var(--acc-line);background:var(--acc-soft);color:var(--acc);font-size:21px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex:none;transition:.18s var(--spring)}
+.addbtn:active{transform:scale(.88)}
+
+/* status timeline */
+.steps{display:flex;gap:0;margin:4px 0}
+.stp{flex:1;position:relative;text-align:center}
+.stp .dot{width:28px;height:28px;border-radius:50%;background:rgba(247,241,232,.06);border:2px solid var(--line2);display:flex;align-items:center;justify-content:center;margin:0 auto 8px;position:relative;z-index:2;font-family:var(--mono);font-size:11px;font-weight:700;color:var(--t3);transition:.3s}
+.stp.done .dot{background:var(--mint);border-color:var(--mint);color:#0a1815}
+.stp.active .dot{background:var(--acc);border-color:var(--acc);color:#1a120a;box-shadow:0 0 0 5px var(--acc-soft);animation:beat 1.8s ease-in-out infinite}
+@keyframes beat{50%{box-shadow:0 0 0 9px transparent}}
+.stp::before{content:"";position:absolute;top:14px;left:-50%;width:100%;height:2px;background:var(--line2);z-index:1}
+.stp:first-child::before{display:none}
+.stp.done::before,.stp.active::before{background:var(--mint)}
+.stp .lb{font-size:10.5px;color:var(--t3);font-weight:600}
+.stp.active .lb{color:var(--acc)} .stp.done .lb{color:var(--t2)}
+.stp .dot svg{width:13px;height:13px}
+
+/* ===== LIVE ACTIVITY banner ===== */
+.live-banner{position:relative;z-index:5;padding:0 14px;margin:2px 0 -2px;max-height:0;overflow:hidden;transition:max-height .4s var(--smooth),opacity .3s;opacity:0}
+.live-banner.show{max-height:90px;opacity:1;margin:4px 0 4px}
+.lb-inner{display:flex;align-items:center;gap:12px;border-radius:20px;padding:11px 14px;cursor:pointer;background:var(--deep);-webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur);border:1px solid var(--glass-brd);box-shadow:var(--glass-hi),0 12px 32px rgba(0,0,0,.4);transition:.2s var(--spring);position:relative;overflow:hidden}
+.lb-inner:active{transform:scale(.98)}
+.lb-inner::after{content:"";position:absolute;left:0;top:0;bottom:0;width:40%;background:linear-gradient(90deg,transparent,rgba(var(--acc-rgb),.10),transparent);animation:lbshine 2.6s linear infinite}
+@keyframes lbshine{0%{transform:translateX(-120%)}100%{transform:translateX(320%)}}
+.lb-inner .av{width:38px;height:38px;font-size:16px}
+.lb-pulse{width:8px;height:8px;border-radius:50%;background:var(--mint);box-shadow:0 0 10px var(--mint);animation:blink 1.4s ease-in-out infinite;flex:none}
+.lb-text{flex:1;min-width:0}
+.lb-t{font-weight:800;font-size:13.5px;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lb-s{font-family:var(--mono);font-size:10.5px;color:var(--t3);margin-top:2px}
+.lb-eta{font-family:var(--mono);font-weight:700;font-size:20px;color:var(--acc);flex:none}
+.lb-eta small{font-size:11px;color:var(--t3)}
+
+/* chat */
+.chat-row{display:flex;gap:12px;align-items:center;padding:13px;border-radius:16px;cursor:pointer;transition:.2s;border:1px solid transparent}
+.chat-row:active{background:var(--glass-soft);border-color:var(--glass-brd)}
+.chat-body{display:flex;flex-direction:column;gap:9px;padding:6px 2px 4px}
+.msg{display:flex;width:100%;animation:bubIn .34s var(--spring) backwards}
+.msg.me{justify-content:flex-end}
+.msg.them{justify-content:flex-start}
+@keyframes bubIn{from{opacity:0;transform:translateY(9px) scale(.95)}}
+.bubble{max-width:78%;padding:10px 14px;border-radius:21px;font-size:14.5px;line-height:1.4;position:relative;word-break:break-word}
+.bubble.them{background:var(--glass);-webkit-backdrop-filter:var(--blur-lite);backdrop-filter:var(--blur-lite);border:1px solid var(--glass-brd);box-shadow:var(--glass-hi);border-bottom-left-radius:7px;color:var(--t1)}
+.bubble.me{background:linear-gradient(150deg,var(--acc),var(--acc-d));color:#1a120a;font-weight:600;border-bottom-right-radius:7px;box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 6px 16px rgba(var(--acc-rgb),.22)}
+.bubble .tm{font-family:var(--mono);font-size:9px;opacity:.55;margin-top:4px;text-align:right;letter-spacing:0}
+.bubble.typing{padding:13px 16px;display:flex;gap:5px}
+.bubble.typing span{width:7px;height:7px;border-radius:50%;background:var(--t3);animation:typed 1.2s ease-in-out infinite}
+.bubble.typing span:nth-child(2){animation-delay:.18s}.bubble.typing span:nth-child(3){animation-delay:.36s}
+@keyframes typed{0%,60%,100%{opacity:.3;transform:translateY(0)}30%{opacity:1;transform:translateY(-4px)}}
+.chat-date{align-self:center;font-family:var(--mono);font-size:10px;color:var(--t3);background:var(--glass-soft);border:1px solid var(--glass-brd);padding:4px 12px;border-radius:20px;margin:2px auto 6px}
+.chat-input{position:sticky;bottom:0;z-index:30;padding:10px 0 calc(8px + var(--safe-b));display:flex;gap:9px;align-items:center;background:linear-gradient(180deg,transparent,rgba(22,18,16,.9) 40%)}
+.chat-input input{flex:1;background:var(--glass);-webkit-backdrop-filter:var(--blur-lite);backdrop-filter:var(--blur-lite);border:1px solid var(--glass-brd);box-shadow:var(--glass-hi);border-radius:var(--r-pill);padding:14px 17px;color:var(--t1);font-family:var(--body);font-size:14.5px;outline:none}
+.chat-input .send{width:48px;height:48px;border-radius:50%;background:linear-gradient(150deg,var(--acc),var(--acc-d));color:#1a120a;border:0;display:flex;align-items:center;justify-content:center;flex:none;cursor:pointer;box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 6px 16px rgba(var(--acc-rgb),.3)}
+.chat-input .send svg{width:19px;height:19px}
+
+/* inputs */
+.field{margin-bottom:14px}
+.field label{display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:1px;text-transform:uppercase;color:var(--t3);margin-bottom:8px}
+.field input,.field textarea{width:100%;background:var(--glass-soft);-webkit-backdrop-filter:var(--blur-lite);backdrop-filter:var(--blur-lite);border:1px solid var(--glass-brd);box-shadow:var(--glass-hi);border-radius:14px;padding:14px 16px;color:var(--t1);font-family:var(--body);font-size:15px;outline:none;transition:.2s}
+.field input:focus,.field textarea:focus{border-color:var(--acc-line)}
+.field textarea{resize:none;min-height:80px;line-height:1.45}
+.photo-up{height:112px;border-radius:15px;border:1.5px dashed var(--line2);background:var(--glass-soft);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;color:var(--t3);cursor:pointer;transition:.2s}
+.photo-up:active{border-color:var(--acc-line);background:var(--acc-soft)}
+.photo-up svg{width:27px;height:27px}
+.photo-up.filled{border-style:solid;border-color:var(--acc-line);background:var(--acc-soft);color:var(--acc)}
+.minimap{height:124px;border-radius:15px;overflow:hidden;position:relative;background:linear-gradient(rgba(28,23,19,.6),rgba(28,23,19,.6));border:1px solid var(--glass-brd);box-shadow:var(--glass-hi)}
+.minimap::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent 0 22px,rgba(247,241,232,.05) 22px 23px),repeating-linear-gradient(90deg,transparent 0 22px,rgba(247,241,232,.05) 22px 23px);mask-image:radial-gradient(120% 100% at 50% 50%,#000,transparent 78%);-webkit-mask-image:radial-gradient(120% 100% at 50% 50%,#000,transparent 78%)}
+.minimap .mpin{position:absolute;left:50%;top:48%;transform:translate(-50%,-100%);z-index:3;color:var(--amber);filter:drop-shadow(0 4px 8px rgba(0,0,0,.55))}
+.minimap .mpin svg{width:32px;height:32px}
+.minimap .mp-pulse{position:absolute;left:50%;top:48%;transform:translate(-50%,-50%);width:18px;height:18px;border-radius:50%;background:rgba(255,122,24,.35);animation:pulse2 2.4s ease-out infinite;z-index:2}
+@keyframes pulse2{0%{transform:translate(-50%,-50%) scale(1);opacity:.7}100%{transform:translate(-50%,-50%) scale(4);opacity:0}}
+.minimap .badge{position:absolute;right:8px;bottom:8px;font-family:var(--mono);font-size:9px;color:var(--t2);background:rgba(11,9,8,.62);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border:1px solid var(--line);padding:4px 9px;border-radius:20px;z-index:4}
+
+/* ===== bottom nav (floating glass pill) ===== */
+.nav-fade{position:absolute;left:0;right:0;bottom:0;height:calc(102px + var(--safe-b));z-index:38;pointer-events:none;background:linear-gradient(to top,#130f0c 4%,rgba(19,15,12,.66) 36%,rgba(19,15,12,.26) 66%,transparent)}
+.nav{position:absolute;left:50%;transform:translateX(-50%);bottom:calc(16px + var(--safe-b));z-index:42;width:calc(100% - 28px);max-width:384px;height:70px;background:var(--deep);-webkit-backdrop-filter:blur(42px) saturate(200%) brightness(1.12);backdrop-filter:blur(42px) saturate(200%) brightness(1.12);border:1px solid var(--glass-brd);border-radius:26px;padding:8px;display:flex;gap:0;box-shadow:var(--glass-hi),inset 0 -1px 0 rgba(0,0,0,.2),0 16px 38px rgba(0,0,0,.5)}
+.nav-ind{position:absolute;top:8px;bottom:8px;left:8px;width:calc((100% - 16px)/4);border-radius:18px;background:var(--acc-soft);border:1px solid var(--acc-line);box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 4px 14px rgba(var(--acc-rgb),.18);transition:transform .42s var(--spring);z-index:0;pointer-events:none}
+.nav button{flex:1;border:0;background:transparent;color:rgba(247,241,232,.52);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:6px 4px;border-radius:18px;cursor:pointer;transition:.24s var(--spring);font-family:var(--body);font-weight:700;font-size:10px;position:relative;z-index:1;letter-spacing:-.01em}
+.nav button svg{width:22px;height:22px;transition:.28s var(--spring)}
+.nav button.on{color:var(--acc)}
+.nav button.on svg{transform:translateY(-1px) scale(1.08);filter:drop-shadow(0 3px 8px rgba(var(--acc-rgb),.4))}
+.nav button:active svg{transform:scale(.84)}
+.nav .badge-n{position:absolute;top:2px;right:calc(50% - 20px);min-width:17px;height:17px;border-radius:9px;background:var(--rose);color:#fff;font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center;padding:0 4px;font-family:var(--mono);box-shadow:0 2px 8px rgba(255,93,108,.5)}
+
+/* FAB mascot orb */
+.mascot{position:absolute;right:16px;bottom:calc(98px + var(--safe-b));z-index:45;width:56px;height:56px;border-radius:50%;background:radial-gradient(circle at 50% 30%, rgba(58,46,34,.95), rgba(22,18,16,.98) 65%);border:1px solid var(--acc-line);display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 -2px 0 rgba(255,255,255,.1) inset,0 12px 30px rgba(0,0,0,.5),0 0 26px rgba(var(--acc-rgb),.28);transition:.2s var(--spring)}
+.mascot:active{transform:scale(.9)}
+.mascot::before{content:"";position:absolute;left:50%;top:9%;transform:translateX(-50%);width:56%;height:28%;border-radius:50%;background:radial-gradient(ellipse,rgba(255,255,255,.32),transparent 70%)}
+.mascot .face{font-size:28px;line-height:1}
+.mascot .ping{position:absolute;top:-2px;right:-2px;width:15px;height:15px;border-radius:50%;background:var(--mint);border:2.5px solid var(--ink);animation:ping 2.4s ease-out infinite}
+@keyframes ping{0%{box-shadow:0 0 0 0 rgba(87,224,200,.45)}100%{box-shadow:0 0 0 10px transparent}}
+
+/* ===== sheets / modals ===== */
+.scrim{position:absolute;inset:0;z-index:90;background:rgba(8,6,5,.55);opacity:0;pointer-events:none;transition:.3s}
+.scrim.show{opacity:1;pointer-events:auto}
+@supports(backdrop-filter:blur(1px)){.scrim.show{-webkit-backdrop-filter:blur(5px);backdrop-filter:blur(5px)}}
+.sheet{position:absolute;left:0;right:0;bottom:0;z-index:91;background:var(--deep);-webkit-backdrop-filter:blur(48px) saturate(200%) brightness(1.06);backdrop-filter:blur(48px) saturate(200%) brightness(1.06);border:1px solid var(--glass-brd);border-bottom:0;border-radius:var(--r-sheet) var(--r-sheet) 0 0;transform:translateY(101%);transition:.44s var(--smooth);max-height:90%;display:flex;flex-direction:column;box-shadow:var(--glass-hi),0 -24px 70px rgba(0,0,0,.6);isolation:isolate}
+.sheet::before{content:"";position:absolute;top:0;left:0;right:0;height:130px;background:linear-gradient(180deg,rgba(255,255,255,.06),transparent);pointer-events:none;border-radius:inherit;z-index:0}
+.sheet.show{transform:translateY(0)}
+.sheet .grab{width:40px;height:5px;border-radius:3px;background:var(--line2);margin:11px auto 4px;flex:none;position:relative;z-index:2}
+.sheet .s-scroll{overflow-y:auto;padding:8px 18px calc(22px + var(--safe-b));scrollbar-width:none;position:relative;z-index:1}
+.sheet .s-scroll::-webkit-scrollbar{display:none}
+.sheet-h{display:flex;align-items:center;gap:13px;padding:6px 0 14px}
+
+/* toast */
+.toast{position:absolute;left:50%;top:calc(16px + var(--safe-t));transform:translate(-50%,-30px);z-index:200;background:var(--deep);-webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur);border:1px solid var(--glass-brd);border-radius:16px;padding:13px 17px;font-size:13.5px;font-weight:700;display:flex;align-items:center;gap:10px;opacity:0;pointer-events:none;transition:.35s var(--spring);max-width:88%;box-shadow:var(--glass-hi),0 14px 34px rgba(0,0,0,.5);letter-spacing:-.01em}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.toast svg{width:18px;height:18px;color:var(--mint);flex:none}
+
+/* QR cinematic */
+.qrbig{width:204px;height:204px;margin:14px auto;border-radius:22px;background:#fff;padding:16px;position:relative;box-shadow:0 0 0 1px var(--line2),0 20px 50px rgba(0,0,0,.45), inset 0 2px 0 rgba(255,255,255,.6)}
+.qrbig svg{width:100%;height:100%}
+.qr-scanline{position:absolute;left:16px;right:16px;height:3px;background:linear-gradient(90deg,transparent,var(--amber),transparent);top:16px;border-radius:3px;box-shadow:0 0 12px var(--amber);animation:scan 2.4s ease-in-out infinite}
+@keyframes scan{0%,100%{top:16px}50%{top:calc(100% - 19px)}}
+.burst{position:absolute;inset:0;z-index:120;display:flex;align-items:center;justify-content:center;flex-direction:column;background:rgba(8,6,5,.72);opacity:0;pointer-events:none;transition:.3s;text-align:center;padding:0 30px}
+.burst.show{opacity:1;pointer-events:auto}
+@supports(backdrop-filter:blur(1px)){.burst.show{-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}}
+.check-ring{width:108px;height:108px;border-radius:50%;background:linear-gradient(150deg,var(--mint),var(--mint-d));display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 0 rgba(87,224,200,.4), inset 0 2px 0 rgba(255,255,255,.4);animation:checkpop .5s var(--spring),ringwave 1s ease-out .2s}
+@keyframes checkpop{from{transform:scale(0)}}
+@keyframes ringwave{to{box-shadow:0 0 0 42px transparent, inset 0 2px 0 rgba(255,255,255,.4)}}
+.check-ring svg{width:56px;height:56px;color:#0a1815;stroke-dasharray:40;stroke-dashoffset:40;animation:draw .5s ease-out .35s forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+.spark{position:absolute;width:8px;height:8px;border-radius:2px;opacity:0}
+.burst.show .spark{animation:fly .9s ease-out forwards}
+@keyframes fly{0%{opacity:1;transform:translate(0,0) scale(1)}100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(.2)}}
+
+/* stars packages */
+.pkg{position:relative;background:var(--glass-soft);-webkit-backdrop-filter:var(--blur-lite);backdrop-filter:var(--blur-lite);border:1px solid var(--glass-brd);box-shadow:var(--glass-hi);border-radius:var(--r-card);padding:16px;text-align:center;cursor:pointer;transition:.22s var(--spring);overflow:hidden}
+.pkg:active{transform:scale(.96)}
+.pkg.hot{background:linear-gradient(160deg,rgba(245,165,36,.16),rgba(247,241,232,.02));border-color:rgba(245,165,36,.42)}
+.pkg.sel{border-color:var(--acc);box-shadow:0 0 0 1px var(--acc),var(--glass-hi),0 10px 26px var(--acc-soft)}
+.pkg .ribbon{position:absolute;top:9px;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:8.5px;letter-spacing:1px;font-weight:700;color:#1a120a;background:var(--gold);padding:3px 10px;border-radius:20px;white-space:nowrap;box-shadow:0 3px 8px rgba(245,165,36,.4)}
+.pkg .stars{font-family:var(--mono);font-weight:700;font-size:26px;color:var(--gold);display:flex;align-items:center;justify-content:center;gap:4px;margin-top:6px}
+.pkg .stars svg{width:20px;height:20px}
+.pkg .d{font-size:12px;color:var(--t2);margin-top:5px}
+.pkg .usd{font-family:var(--mono);font-size:10px;color:var(--t3);margin-top:3px}
+
+/* misc */
+.kv{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid var(--line)}
+.kv:last-child{border-bottom:0}
+.kv .k{color:var(--t2);font-size:14px} .kv .v{font-family:var(--mono);font-weight:700;font-size:14px}
+.empty{text-align:center;padding:46px 20px;color:var(--t3)}
+.empty .em{font-size:46px;margin-bottom:12px}
+.rating-big{font-family:var(--mono);font-weight:700;font-size:40px;color:var(--gold);line-height:1}
+.starpick{display:flex;gap:8px;justify-content:center;margin:6px 0 14px}
+.starpick button{background:transparent;border:0;font-size:36px;cursor:pointer;color:rgba(247,241,232,.14);transition:.15s var(--spring);line-height:1}
+.starpick button.on{color:var(--gold);transform:scale(1.12)}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip-sel{font-family:var(--body);font-size:13px;font-weight:600;padding:9px 14px;border-radius:30px;border:1px solid var(--glass-brd);background:var(--glass-soft);color:var(--t2);cursor:pointer;transition:.18s var(--spring)}
+.chip-sel.on{border-color:var(--acc-line);background:var(--acc-soft);color:var(--acc)}
+.bigstat{display:flex;gap:10px}
+.bigstat .s{position:relative;flex:1;background:var(--glass-soft);-webkit-backdrop-filter:var(--blur-lite);backdrop-filter:var(--blur-lite);border:1px solid var(--glass-brd);box-shadow:var(--glass-hi);border-radius:15px;padding:14px 8px;text-align:center;overflow:hidden}
+.bigstat .n{font-family:var(--mono);font-weight:700;font-size:22px;color:var(--acc)}
+.bigstat .l{font-size:10px;color:var(--t3);margin-top:3px}
+.online-tg{display:flex;align-items:center;gap:10px;justify-content:space-between;background:var(--glass-soft);-webkit-backdrop-filter:var(--blur-lite);backdrop-filter:var(--blur-lite);border:1px solid var(--glass-brd);box-shadow:var(--glass-hi);border-radius:15px;padding:14px 15px}
+.switch{width:48px;height:28px;border-radius:20px;background:rgba(247,241,232,.12);position:relative;cursor:pointer;transition:.25s;flex:none;border:1px solid var(--line)}
+.switch.on{background:var(--mint);border-color:var(--mint)}
+.switch::after{content:"";position:absolute;top:3px;left:3px;width:21px;height:21px;border-radius:50%;background:#fff;transition:.25s var(--spring);box-shadow:0 2px 6px rgba(0,0,0,.3)}
+.switch.on::after{left:24px}
+
+/* onboarding */
+.onb{position:absolute;inset:0;z-index:80;display:flex;flex-direction:column;padding:calc(46px + var(--safe-t)) 24px calc(28px + var(--safe-b));transition:.5s var(--ease)}
+.onb.hide{opacity:0;transform:scale(1.05);pointer-events:none}
+.onb-logo{width:64px;height:64px;border-radius:20px;background:linear-gradient(150deg,var(--amber),var(--gold));display:flex;align-items:center;justify-content:center;box-shadow:0 14px 40px rgba(255,122,24,.45), inset 0 1px 0 rgba(255,255,255,.45);margin-bottom:26px;position:relative}
+.onb-logo::after{content:"";position:absolute;top:5px;left:9px;right:9px;height:36%;border-radius:13px;background:linear-gradient(180deg,rgba(255,255,255,.5),transparent)}
+.onb-logo svg{width:36px;height:36px;position:relative;z-index:1}
+.rolecard{position:relative;background:var(--glass);-webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur);border:1px solid var(--glass-brd);box-shadow:var(--glass-hi),var(--glass-sh);border-radius:22px;padding:20px;display:flex;gap:15px;align-items:center;cursor:pointer;transition:.22s var(--spring);margin-bottom:14px;overflow:hidden}
+.rolecard::before{content:"";position:absolute;top:0;left:0;right:0;height:46%;background:linear-gradient(180deg,rgba(255,255,255,.07),transparent);pointer-events:none}
+.rolecard:active{transform:scale(.98)}
+.rolecard.d:active{border-color:var(--amber)}.rolecard.r:active{border-color:var(--mint)}
+.rolecard>*{position:relative;z-index:1}
+.rolecard .ri{width:56px;height:56px;border-radius:17px;display:flex;align-items:center;justify-content:center;flex:none}
+.rolecard.d .ri{background:rgba(255,122,24,.16);border:1px solid rgba(255,122,24,.3);color:var(--amber)}
+.rolecard.r .ri{background:rgba(87,224,200,.14);border:1px solid rgba(87,224,200,.3);color:var(--mint)}
+.rolecard .ri svg{width:28px;height:28px}
+.rolecard .rt{font-family:var(--disp);font-weight:700;font-size:18px;letter-spacing:-.02em}
+.rolecard .rd{font-size:13px;color:var(--t2);margin-top:4px;line-height:1.42}
+.rolecard .arr{color:var(--t3);font-size:18px}
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="phone">
+    <div class="aurora"><span class="orb o1"></span><span class="orb o2"></span><span class="orb o3"></span><span class="orb o4"></span></div>
+    <div class="grain"></div>
+
+    <!-- ONBOARDING -->
+    <div class="onb" id="onb">
+      <div class="onb-logo"><svg viewBox="0 0 24 24" fill="none" stroke="#1a120a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 3h15v13H1z"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></div>
+      <div class="eyebrow"><i></i>Telegram Mini App</div>
+      <div class="h1" style="font-size:36px">Кто ты<br>в очереди?</div>
+      <p class="muted" style="margin:14px 0 30px;font-size:15px;line-height:1.5">КаргоБоб — мост последних 500&nbsp;метров. Выбери роль — переключить можно в любой момент.</p>
+
+      <div class="rolecard d" onclick="pickRole('driver')">
+        <div class="ri"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17H3v-5l2-5h11l4 5v5h-2"/><circle cx="7.5" cy="17.5" r="2"/><circle cx="16.5" cy="17.5" r="2"/></svg></div>
+        <div style="flex:1"><div class="rt">Я в машине</div><div class="rd">Стою в очереди. Хочу воду, кофе, перекус — не теряя места.</div></div>
+        <div class="arr">→</div>
+      </div>
+      <div class="rolecard r" onclick="pickRole('runner')">
+        <div class="ri"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13" cy="4" r="2"/><path d="m9 20 2-5 2 2 1 3"/><path d="m6 11 3-2 3 2 2 2"/><path d="M16 8l2 1"/></svg></div>
+        <div style="flex:1"><div class="rt">Я раннер</div><div class="rd">Соберу витрину рядом и донесу к машинам. Зарабатываю на услуге.</div></div>
+        <div class="arr">→</div>
+      </div>
+
+      <div style="margin-top:auto;text-align:center" class="faint mono">P2P · оплата товара напрямую · мы не берём % с товара</div>
+    </div>
+
+    <!-- APP -->
+    <div class="app" id="app" style="display:none">
+      <div class="top" id="topbar"></div>
+      <div class="live-banner" id="liveBanner"></div>
+      <div class="scroll" id="screen"></div>
+      <div class="nav-fade" id="navFade"></div>
+      <div class="nav" id="nav"></div>
+    </div>
+
+    <div class="mascot" id="mascot" onclick="openMascot()" style="display:none"><span class="face">🤖</span><span class="ping"></span></div>
+
+    <div class="scrim" id="scrim" onclick="closeSheet()"></div>
+    <div class="sheet" id="sheet"><div class="grab"></div><div class="s-scroll" id="sheetBody"></div></div>
+    <div class="burst" id="burst"></div>
+    <div class="toast" id="toast"></div>
+  </div>
+</div>
+
+<script>
+/* ============ Telegram SDK ============ */
+const TG = window.Telegram?.WebApp;
+try{ TG?.ready(); TG?.expand(); TG?.setHeaderColor?.('#161210'); TG?.setBackgroundColor?.('#161210'); }catch(e){}
+function haptic(type='light'){ try{ if(type==='success'||type==='error'||type==='warning') TG?.HapticFeedback?.notificationOccurred(type); else TG?.HapticFeedback?.impactOccurred(type); }catch(e){} }
+
+/* ============ i18n ============ */
+const DICT={
+ ru:{
+  near:'Рядом',orders:'Заказы',chats:'Чат',profile:'Профиль',store:'Витрина',feed:'Лента',driver:'Водитель',runner:'Раннер',
+  loc:'АЗС на Кутузовском',row:'4-й ряд · 6ч в очереди',
+  quickT:'Что принести к машине?',quickS:'Опиши — раннер рядом найдёт и донесёт',
+  nearTitle:'Раннеры',nearAccent:'рядом с тобой',
+  live:'в эфире',preorder:'Оставить предзаказ',
+  orderFrom:'Заказать у',openStore:'Открыть витрину',
+  reqTitle:'Что принести?',reqSub:'Опиши, что нужно — раннер рядом найдёт и добавит в витрину.',
+  carPin:'Где твоя машина',carPhoto:'Фото машины и ориентира',descr:'Описание',
+  descrPh:'Серый Solaris, 3-й ряд от колонки №4, рядом фура',post:'Опубликовать предзаказ',
+  confirmOrder:'Подтвердить заказ',total:'Товар (P2P)',fee:'Доставка',
+  noOrders:'Пока нет заказов',noOrdersSub:'Выбери раннера на вкладке «Рядом».',
+  active:'Активный',closeQr:'Закрыть по QR',
+  yourQr:'Покажи раннеру',scanHint:'Раннер сканирует — заказ закроется',
+  step1:'Заказ',step2:'Приём',step3:'Передача',step4:'Закрытие',
+  rate:'Оцени раннера',leaveReview:'Оставить отзыв',send:'Отправить',
+  reviewPh:'Коротко: как прошло?',anon:'Отзыв под псевдонимом',
+  closed:'Заказ закрыт!',pointsEarned:'+10 баллов · отзыв разблокирован',
+  msgPh:'Сообщение…',online:'На линии',offline:'Не на линии',
+  myStore:'Моя витрина',addItem:'Добавить товар',
+  incoming:'Входящие',openReq:'Запросы рядом',accept:'Принять заказ',
+  earned:'Заработано',deliveries:'Доставок',ratingW:'Рейтинг',
+  subTitle:'Подписка',subSub:'Плати за доступ к новым заказам, не за товар. Чистый сплит.',
+  daysLeft:'дней доступа',pickPkg:'Пакет доставок',
+  hot:'ХОДОВОЙ',refTitle:'Приглашай — получай дни',refSub:'Раннер по ссылке: +1 день. 10 покупателей: +1 день. Макс 7/мес.',
+  invite:'Пригласить',generated:'Опубликовано в ленте!',accepted:'Заказ принят — иди к машине',
+  itemAdded:'Добавлено в витрину',paid:'Оплачено · доступ продлён',
+  switchRole:'Сменить роль',lang:'Язык',
+  qrConfirmed:'QR-подтверждён',newbie:'новичок',min:'мин',
+  mascotHi:'Боб на связи 🤖',mascotMsg:'Я помогу разрулить заказ. Подсказать, как закрыть по QR, или найти раннера побыстрее?',
+  ask1:'Как работает QR?',ask2:'Где моя машина на карте?',ask3:'Это законно?',
+  scanning:'Сканирую QR…',reqList:'Открытые запросы',addToStore:'Добавить в витрину',
+  setPrice:'Цена с доставкой',itemName:'Название',save:'Сохранить',
+  meet:'Встретить и закрыть',pay2runner:'товар напрямую раннеру (нал/СБП)',youGet:'Тебе за услугу',
+  scansToday:'сканов сегодня',track:'нажми, чтобы отследить',onTheWay:'в пути',
+  storefronts:'Витрины рядом',
+ },
+ en:{
+  near:'Nearby',orders:'Orders',chats:'Chat',profile:'Profile',store:'Storefront',feed:'Feed',driver:'Driver',runner:'Runner',
+  loc:'Gas station, Kutuzovsky',row:'Row 4 · 6h in line',
+  quickT:'What to bring to the car?',quickS:'Describe it — a runner nearby will bring it',
+  nearTitle:'Runners',nearAccent:'near you',
+  live:'live',preorder:'Leave a pre-order',
+  orderFrom:'Order from',openStore:'Open storefront',
+  reqTitle:'What to bring?',reqSub:'Describe it — a runner nearby will find it and add to their store.',
+  carPin:'Where is your car',carPhoto:'Photo of car & landmark',descr:'Description',
+  descrPh:'Grey Solaris, 3rd row from pump #4, truck nearby',post:'Post pre-order',
+  confirmOrder:'Confirm order',total:'Goods (P2P)',fee:'Delivery',
+  noOrders:'No orders yet',noOrdersSub:'Pick a runner on the “Nearby” tab.',
+  active:'Active',closeQr:'Close with QR',
+  yourQr:'Show the runner',scanHint:'Runner scans — order closes',
+  step1:'Order',step2:'Accept',step3:'Handover',step4:'Close',
+  rate:'Rate the runner',leaveReview:'Leave a review',send:'Send',
+  reviewPh:'Briefly: how did it go?',anon:'Review under a pseudonym',
+  closed:'Order closed!',pointsEarned:'+10 points · review unlocked',
+  msgPh:'Message…',online:'Online',offline:'Offline',
+  myStore:'My storefront',addItem:'Add item',
+  incoming:'Incoming',openReq:'Requests nearby',accept:'Accept order',
+  earned:'Earned',deliveries:'Deliveries',ratingW:'Rating',
+  subTitle:'Subscription',subSub:'Pay for access to new orders, not for goods. Clean split.',
+  daysLeft:'days of access',pickPkg:'Delivery pack',
+  hot:'POPULAR',refTitle:'Invite — get days',refSub:'A runner via your link: +1 day. 10 buyers: +1 day. Max 7/mo.',
+  invite:'Invite',generated:'Posted to the feed!',accepted:'Order accepted — head to the car',
+  itemAdded:'Added to storefront',paid:'Paid · access extended',
+  switchRole:'Switch role',lang:'Language',
+  qrConfirmed:'QR-verified',newbie:'newbie',min:'min',
+  mascotHi:'Bob here 🤖',mascotMsg:'I help you run the order. Want a hand closing with QR, or finding a faster runner?',
+  ask1:'How does QR work?',ask2:'Where is my car on the map?',ask3:'Is this legal?',
+  scanning:'Scanning QR…',reqList:'Open requests',addToStore:'Add to store',
+  setPrice:'Price incl. delivery',itemName:'Name',save:'Save',
+  meet:'Meet & close',pay2runner:'goods directly to runner (cash/SBP)',youGet:'You get for service',
+  scansToday:'scans today',track:'tap to track',onTheWay:'on the way',
+  storefronts:'Storefronts nearby',
+ }
+};
+function t(k){ return (DICT[S.lang]||DICT.ru)[k] ?? k; }
+
+/* ============ icons ============ */
+const I={
+ near:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.5-7-11a7 7 0 0 1 14 0c0 4.5-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>',
+ orders:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7h14l-1 13H6L5 7z"/><path d="M9 7V5a3 3 0 0 1 6 0v2"/></svg>',
+ chat:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-12 7.6L3 21l1.9-5.6A8.4 8.4 0 1 1 21 11.5z"/></svg>',
+ profile:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>',
+ store:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h16l-1-4H5L4 9z"/><path d="M5 9v11h14V9"/><path d="M9 20v-6h6v6"/></svg>',
+ feed:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg>',
+ list:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>',
+ radar:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 12l5-3"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></svg>',
+ car:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17H3v-5l2-5h11l4 5v5h-2"/><circle cx="7.5" cy="17.5" r="2"/><circle cx="16.5" cy="17.5" r="2"/></svg>',
+ send:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4 20-7z"/></svg>',
+ check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>',
+ qr:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3M21 14v7M17 21h-3M21 17v.01"/></svg>',
+ star:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.9 6.3 6.9.7-5.1 4.6 1.4 6.8L12 17.8 5.9 20.4l1.4-6.8L2.2 9l6.9-.7L12 2z"/></svg>',
+ plus:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
+ cam:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h4l1.5-2h7L17 8h4v11H3z"/><circle cx="12" cy="13" r="3.5"/></svg>',
+ pin:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg>',
+ globe:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>',
+ scan:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7V5a1 1 0 0 1 1-1h2M17 4h2a1 1 0 0 1 1 1v2M20 17v2a1 1 0 0 1-1 1h-2M7 20H5a1 1 0 0 1-1-1v-2M4 12h16"/></svg>',
+ zap:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg>',
+ basket:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 11h14l-1.5 8.5a2 2 0 0 1-2 1.5H8.5a2 2 0 0 1-2-1.5L5 11z"/><path d="M9 11 12 4l3 7"/></svg>',
+ bell:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9a6 6 0 0 1 12 0c0 5 2 6 2 6H4s2-1 2-6"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>',
+ info:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>',
+ doc:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h8l4 4v16H6z"/><path d="M14 2v4h4M9 13h6M9 17h6"/></svg>',
+ boost:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>',
+};
+/* filled icons for active tab */
+const IF={
+ near:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg>',
+ orders:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M5 7h14l-1 13.1a1 1 0 0 1-1 .9H7a1 1 0 0 1-1-.9L5 7zm2.2-.8a4.8 4.8 0 0 1 9.6 0h-2.1a2.7 2.7 0 0 0-5.4 0H7.2z"/></svg>',
+ chat:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3C6.9 3 3 6.6 3 11c0 2.3 1.1 4.4 3 5.8L4.8 21l4.6-1.9c.8.2 1.7.4 2.6.4 5.1 0 9-3.6 9-8s-3.9-8.5-9-8.5z"/></svg>',
+ profile:'<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="8" r="4.2"/><path d="M3.8 21c0-4.4 3.7-7 8.2-7s8.2 2.6 8.2 7z"/></svg>',
+ store:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M4.2 9 5 5h14l.8 4a2.3 2.3 0 0 1-4.2.9 2.3 2.3 0 0 1-4.1 0 2.3 2.3 0 0 1-4.1 0A2.3 2.3 0 0 1 4.2 9zm.8 2.7V20h6.2v-5h2v5H19v-8.3a3.7 3.7 0 0 1-3.1-.4 3.7 3.7 0 0 1-4.1 0 3.7 3.7 0 0 1-4.1 0 3.7 3.7 0 0 1-2.7.4z"/></svg>',
+ feed:'<svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="5" width="18" height="3.2" rx="1.6"/><rect x="3" y="10.4" width="18" height="3.2" rx="1.6"/><rect x="3" y="15.8" width="12" height="3.2" rx="1.6"/></svg>',
+};
+
+/* ============ mock data ============ */
+const RUNNERS=[
+ {id:'kostya',name:'Костя',nameEn:'Kostya',col:'linear-gradient(150deg,#ff7a18,#f5a524)',rating:4.9,orders:248,qr:true,eta:8,dist:120,online:true,x:62,y:30,
+   tags:['быстро','цена честная'],tagsEn:['fast','fair price'],
+   items:[{e:'💧',n:'Вода 0.5 л',ne:'Water 0.5 L',sub:'холодная',p:80},{e:'☕',n:'Кофе латте',ne:'Latte',sub:'из пекарни',p:180},{e:'🌯',n:'Шаверма',ne:'Shawarma',sub:'курица',p:320},{e:'🥪',n:'Сэндвич',ne:'Sandwich',sub:'ветчина-сыр',p:220},{e:'🍫',n:'Сникерс',ne:'Snickers',sub:'',p:90},{e:'🔋',n:'Пауэрбанк',ne:'Power bank',sub:'аренда 2 ч',p:200}]},
+ {id:'timur',name:'Тимур',nameEn:'Timur',col:'linear-gradient(150deg,#57e0c8,#1f9f8c)',rating:4.8,orders:151,qr:true,eta:6,dist:90,online:true,x:40,y:58,
+   tags:['рядом','всё есть'],tagsEn:['close','has it all'],
+   items:[{e:'💧',n:'Вода 1 л',ne:'Water 1 L',sub:'',p:110},{e:'⚡',n:'Энергетик',ne:'Energy drink',sub:'',p:150},{e:'🍌',n:'Банан',ne:'Banana',sub:'2 шт',p:60},{e:'🧻',n:'Влажные салфетки',ne:'Wet wipes',sub:'',p:90},{e:'🍦',n:'Мороженое',ne:'Ice cream',sub:'',p:120}]},
+ {id:'marina',name:'Марина',nameEn:'Marina',col:'linear-gradient(150deg,#f5a524,#ff7a18)',rating:4.7,orders:96,qr:true,eta:12,dist:300,online:true,x:74,y:66,
+   tags:['кофе топ'],tagsEn:['great coffee'],
+   items:[{e:'☕',n:'Капучино',ne:'Cappuccino',sub:'',p:190},{e:'🥐',n:'Круассан',ne:'Croissant',sub:'',p:140},{e:'💧',n:'Вода 0.5 л',ne:'Water 0.5 L',sub:'',p:85},{e:'🍪',n:'Печенье',ne:'Cookies',sub:'',p:110}]},
+ {id:'lena',name:'Лена',nameEn:'Lena',col:'linear-gradient(150deg,#94877a,#cabfb0)',rating:5.0,orders:12,qr:false,newbie:true,eta:15,dist:420,online:true,x:24,y:34,
+   tags:['новичок'],tagsEn:['newbie'],
+   items:[{e:'💧',n:'Вода 0.5 л',ne:'Water 0.5 L',sub:'',p:70},{e:'🥤',n:'Кола',ne:'Cola',sub:'',p:120},{e:'🍫',n:'Шоколадка',ne:'Chocolate',sub:'',p:95}]},
+];
+const REQ_FEED=[
+ {id:'r1',who:'Игорь · 4-й ряд',whoEn:'Igor · row 4',txt:'Курица-гриль целиком, если есть',txtEn:'Whole grilled chicken if any',ago:'2 мин',agoEn:'2 min'},
+ {id:'r2',who:'Аноним · у колонки №2',whoEn:'Anon · pump #2',txt:'2 бутылки воды холодной + лёд',txtEn:'2 cold waters + ice',ago:'5 мин',agoEn:'5 min'},
+ {id:'r3',who:'Sveta · 6-й ряд',whoEn:'Sveta · row 6',txt:'Зарядка/кабель iPhone, на 20 мин',txtEn:'iPhone charger/cable, 20 min',ago:'9 мин',agoEn:'9 min'},
+];
+const REVIEWS=[
+ {who:'Странник №418',whoEn:'Wanderer #418',st:5,txt:'быстро, цена честная, нашёл по описанию за минуту',txtEn:'fast, fair price, found me by description in a minute'},
+ {who:'Очередь-2',whoEn:'Queue-2',st:5,txt:'принёс холодную воду пока я плавился, спаситель',txtEn:'brought cold water while I melted, a lifesaver'},
+ {who:'Серый Solaris',whoEn:'Grey Solaris',st:4,txt:'всё ок, чуть подождал',txtEn:'all good, waited a bit'},
+];
+const PACKS=[
+ {s:100,d:{ru:'5 доставок · 24ч',en:'5 deliveries · 24h'},usd:'≈ $2'},
+ {s:200,d:{ru:'15 доставок · 24ч',en:'15 deliveries · 24h'},usd:'≈ $4'},
+ {s:500,d:{ru:'50 доставок · 48ч',en:'50 deliveries · 48h'},usd:'≈ $10',hot:true},
+ {s:1000,d:{ru:'130 доставок · 72ч',en:'130 deliveries · 72h'},usd:'≈ $20'},
+];
+
+/* ============ state ============ */
+const S={
+ role:'driver', lang:'ru', tab:'near', view:'radar',
+ cart:{}, activeRunner:null, order:null, storeOpen:false,
+ stars:280, daysLeft:3, scansToday:7, chatWith:null,
+ messages:{ kostya:[
+   {me:false,tx:{ru:'Привет! Вижу твой заказ. Вода и кофе?',en:'Hi! I see your order. Water and coffee?'},tm:'14:02'},
+   {me:true,tx:{ru:'Да, серый Solaris, 3-й ряд от 4-й колонки',en:'Yes, grey Solaris, 3rd row from pump 4'},tm:'14:02'},
+   {me:false,tx:{ru:'Принял, иду. 8 минут 🏃',en:'Got it, on my way. 8 min 🏃'},tm:'14:03'},
+ ]},
+ reviewStars:5, history:[], queue:'loc', dir:0, radarSeen:false,
+};
+const rname=r=>S.lang==='en'?(r.nameEn||r.name):r.name;
+const cartCount=()=>Object.values(S.cart).reduce((a,b)=>a+b,0);
+const cartTotal=()=>{ if(!S.activeRunner)return 0; let t=0; S.activeRunner.items.forEach((it,i)=>{ const id=S.activeRunner.id+'_'+i; t+=(S.cart[id]||0)*it.p; }); return t; };
+
+/* ============ boot ============ */
+function pickRole(role){ haptic('medium'); setRole(role);
+ document.getElementById('onb').classList.add('hide');
+ setTimeout(()=>{ document.getElementById('onb').style.display='none'; document.getElementById('app').style.display='flex'; document.getElementById('mascot').style.display='flex'; render(); },440);
+}
+function setRole(role){ S.role=role; document.body.classList.toggle('runner',role==='runner'); S.tab = role==='driver'?'near':'store'; }
+
+const TABS={ driver:[['near','near'],['orders','orders'],['chats','chat'],['profile','profile']], runner:[['store','store'],['feed','feed'],['chats','chat'],['profile','profile']] };
+
+/* ============ render root ============ */
+function render(){ renderTop(); renderNav(); renderLiveBanner(); renderScreen(); }
+function renderTop(){
+ document.getElementById('topbar').innerHTML=`
+  <div class="brand">
+    <div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="#1a120a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 3h15v13H1z"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></div>
+    <div><div class="nm">КаргоБоб</div><div class="sb">${S.role==='driver'?t('driver'):t('runner')} MODE</div></div>
+  </div>
+  <div class="top-act">
+    <div class="icon-btn lang" onclick="toggleLang()">${S.lang.toUpperCase()}</div>
+    <div class="icon-btn" onclick="openNotifications()" style="position:relative">${I.bell}<span class="badge-n" style="top:-4px;right:-4px">2</span></div>
+    <div class="icon-btn" onclick="openMascot()">${I.chat}</div>
+  </div>`;
+}
+function renderNav(){
+ const tabs=TABS[S.role]; const badge={chats:(S.role==='driver'?1:2)};
+ const idx=Math.max(0,tabs.findIndex(([k])=>k===S.tab));
+ document.getElementById('nav').innerHTML=`<span class="nav-ind" style="transform:translateX(${idx*100}%)"></span>`+tabs.map(([key,icon])=>`
+   <button class="${S.tab===key?'on':''}" onclick="go('${key}')">${S.tab===key?(IF[icon]||I[icon]):I[icon]}<span>${t(key)}</span>${badge[key]?`<span class="badge-n">${badge[key]}</span>`:''}</button>`).join('');
+}
+function renderLiveBanner(){
+ const el=document.getElementById('liveBanner'); const o=S.order;
+ if(!o || o.status>=4){ el.classList.remove('show'); el.innerHTML=''; return; }
+ const r=o.runner; const st = o.status===2?t('onTheWay'):(o.status===3?t('step3'):t('onTheWay'));
+ el.innerHTML=`<div class="lb-inner" onclick="openLive()">
+   <span class="lb-pulse"></span>
+   <div class="av" style="background:${r.col}">${rname(r)[0]}</div>
+   <div class="lb-text"><div class="lb-t">${rname(r)} · ${st}</div><div class="lb-s">${t('track')}</div></div>
+   <div class="lb-eta">~${o.eta}<small>${S.lang==='ru'?'м':'m'}</small></div>
+ </div>`;
+ el.classList.add('show');
+}
+function openLive(){ haptic('light'); if(S.role==='driver'){ go('orders'); } else { openChat('kostya'); } }
+function go(tab){ if(S.tab===tab)return; haptic('light'); const ord=TABS[S.role].map(x=>x[0]); S.dir=ord.indexOf(tab)>ord.indexOf(S.tab)?1:-1; S.tab=tab; render(); document.getElementById('screen').scrollTop=0; }
+function toggleLang(){ haptic('light'); S.lang=S.lang==='ru'?'en':'ru'; render(); }
+
+/* ============ screens ============ */
+function renderScreen(){
+ const el=document.getElementById('screen'); let html='';
+ if(S.role==='driver'){
+   if(S.tab==='near') html=scrNear(); else if(S.tab==='orders') html=scrOrders(); else if(S.tab==='chats') html=scrChats(); else if(S.tab==='profile') html=scrProfileDriver();
+ }else{
+   if(S.tab==='store') html=scrStore(); else if(S.tab==='feed') html=scrFeed(); else if(S.tab==='chats') html=scrChats(); else if(S.tab==='profile') html=scrProfileRunner();
+ }
+ el.innerHTML=`<div class="pad fade ${S.dir>0?'sl-f':(S.dir<0?'sl-b':'')}">${html}</div>`; S.dir=0;
+ if(S.tab==='near') mountRadar();
+ animateCounts();
+}
+
+/* ---- DRIVER: NEAR ---- */
+function scrNear(){
+ return `
+  <div style="display:flex;justify-content:space-between;align-items:center;margin:4px 0 14px">
+    <div class="loc-chip" onclick="openQueuePicker()" style="cursor:pointer">${I.pin}${t('loc')} <span class="ch">· ${t('row')}</span></div>
+  </div>
+
+  <div class="qhero" onclick="openPreorder()">
+    <div class="qrow">
+      <div class="qicon">${I.basket}</div>
+      <div style="flex:1"><div class="qt">${t('quickT')}</div><div class="qs">${t('quickS')}</div></div>
+      <div class="arr faint" style="font-size:20px">→</div>
+    </div>
+    <div class="qchips"><span class="qc">💧 ${S.lang==='ru'?'вода':'water'}</span><span class="qc">☕ ${S.lang==='ru'?'кофе':'coffee'}</span><span class="qc">🌯 ${S.lang==='ru'?'перекус':'snack'}</span><span class="qc">🔋 ${S.lang==='ru'?'зарядка':'charger'}</span></div>
+  </div>
+
+  <div class="eyebrow"><i></i>500 m · ${RUNNERS.filter(r=>r.online).length} ${S.lang==='ru'?'раннеров в эфире':'runners live'}</div>
+  <div class="radar-wrap" id="radarWrap">
+    <div class="radar" id="radar"></div>
+    <div class="radar-foot">
+      <span class="live"><span class="dot"></span>${t('live')}</span>
+      <div class="viewtoggle"><button class="${S.view==='radar'?'on':''}" onclick="setView('radar')">${I.radar}</button><button class="${S.view==='list'?'on':''}" onclick="setView('list')">${I.list}</button></div>
+    </div>
+  </div>
+
+  <div class="sec-t">${t('storefronts')}</div>
+  ${RUNNERS.map(r=>runnerRow(r)).join('')}
+ `;
+}
+function runnerRow(r){
+ const stars='★'.repeat(Math.round(r.rating));
+ return `<div class="runner" onclick="openRunner('${r.id}')" style="margin-bottom:10px">
+   <div class="av" style="background:${r.col}">${rname(r)[0]}${r.online?'<span class="on-dot"></span>':''}</div>
+   <div class="info">
+     <div class="nm">${rname(r)} ${r.qr?`<span class="qrbadge">${I.qr}${t('qrConfirmed')}</span>`:''}${r.newbie?`<span class="newbadge">${t('newbie')}</span>`:''}</div>
+     <div class="meta"><span class="stars-i">${stars}</span> ${r.rating} · ${r.orders} ${S.lang==='ru'?'зак.':'ord.'} · ${r.items.length} ${S.lang==='ru'?'поз.':'items'}</div>
+   </div>
+   <div class="right"><div class="eta">~${r.eta} ${t('min')}</div><div class="dist">${r.dist} м</div></div>
+ </div>`;
+}
+function setView(v){ haptic('light'); S.view=v; renderScreen(); }
+function mountRadar(){
+ const radar=document.getElementById('radar'); if(!radar)return;
+ if(S.view==='list'){ document.getElementById('radarWrap').style.height='auto'; radar.style.position='relative'; radar.innerHTML='<div style="padding:14px">'+RUNNERS.map(r=>runnerRow(r)).join('')+'</div>'; const rf=document.querySelector('.radar-foot'); if(rf)rf.style.display='none'; return; }
+ if(!S.radarSeen){ S.radarSeen=true; radar.innerHTML=`<div class="radar-scan"><div class="rs-ring"></div><div class="rs-txt">${S.lang==='ru'?'Ищу раннеров рядом…':'Finding runners nearby…'}</div></div>`; setTimeout(()=>{ const rd=document.getElementById('radar'); if(rd&&S.tab==='near'&&S.view==='radar') paintRadar(rd); },850); return; }
+ paintRadar(radar);
+}
+function paintRadar(radar){
+ radar.innerHTML=`
+   <div class="sweep"></div><div class="ring r1"></div><div class="ring r2"></div><div class="ring r3"></div><div class="ring-lbl">~500 м</div>
+   <div class="me"><div class="pulse"></div><div class="car">${I.car}</div><div class="lbl">${S.lang==='ru'?'ТЫ':'YOU'}</div></div>
+   ${RUNNERS.map((r,i)=>`<div class="pin" style="left:${r.x}%;top:${r.y}%;animation-delay:${.1+i*.1}s" onclick="openRunner('${r.id}')"><div class="av" style="background:${r.col};animation:bob 3.4s ease-in-out ${(i*.4).toFixed(1)}s infinite">${rname(r)[0]}</div><div class="pp">${rname(r)} · <b>${r.eta}${S.lang==='ru'?'м':'m'}</b></div></div>`).join('')}
+ `;
+}
+
+/* ---- runner storefront sheet ---- */
+function openRunner(id){
+ haptic('medium'); S.activeRunner=RUNNERS.find(r=>r.id===id); S.cart={};
+ const r=S.activeRunner, stars='★'.repeat(Math.round(r.rating));
+ const body=`
+  <div class="sheet-h">
+    <div class="av" style="width:56px;height:56px;font-size:24px;background:${r.col}">${rname(r)[0]}</div>
+    <div style="flex:1"><div class="h2">${rname(r)}</div><div class="mono" style="font-size:12px;color:var(--t3);margin-top:4px"><span class="stars-i">${stars}</span> ${r.rating} · ${r.orders} ${S.lang==='ru'?'заказов':'orders'} · ~${r.eta} ${t('min')}</div></div>
+    ${r.qr?`<span class="qrbadge">${I.qr}${t('qrConfirmed')}</span>`:''}
+  </div>
+  <div class="card acc" style="margin-bottom:14px;display:flex;gap:8px;flex-wrap:wrap;padding:12px 14px">
+    ${(S.lang==='en'?r.tagsEn:r.tags).map(tg=>`<span class="tag">${tg}</span>`).join('')}<span class="tag neutral">${r.dist} м · 500 м зона</span>
+  </div>
+  <div class="sec-t" style="margin-top:6px">${t('openStore')}</div>
+  <div id="itemsList">${r.items.map((it,i)=>itemRow(it,i)).join('')}</div>
+  <div class="sec-t">${S.lang==='ru'?'Отзывы':'Reviews'} <span class="faint" style="font-weight:600;text-transform:none;letter-spacing:0">${r.orders} ${S.lang==='ru'?'сделок':'deals'}</span></div>
+  ${REVIEWS.map(rv=>`<div class="card" style="margin-bottom:10px;padding:13px 15px"><div style="display:flex;justify-content:space-between;margin-bottom:6px"><span class="mono" style="font-size:11px;color:var(--t3)">${S.lang==='en'?rv.whoEn:rv.who}</span><span class="stars-i" style="font-size:12px">${'★'.repeat(rv.st)}</span></div><div style="font-size:13.5px;color:var(--t2);font-style:italic">«${S.lang==='en'?rv.txtEn:rv.txt}»</div></div>`).join('')}
+  <div style="height:84px"></div><div id="cartBar"></div>`;
+ openSheet(body); renderCartBar();
+}
+function itemRow(it,i){
+ const id=S.activeRunner.id+'_'+i; const q=S.cart[id]||0; const nm=S.lang==='en'?(it.ne||it.n):it.n;
+ return `<div class="item"><div class="ic">${it.e}</div>
+   <div style="flex:1"><div class="nm">${nm}</div>${it.sub?`<div class="sub">${it.sub}</div>`:''}</div>
+   <div class="price" style="margin-right:10px">${it.p} ₽</div>
+   ${q>0?`<div class="stepper"><button onclick="chQty('${id}',-1)">−</button><span class="q">${q}</span><button onclick="chQty('${id}',1)">+</button></div>`:`<button class="addbtn" onclick="chQty('${id}',1)">+</button>`}
+ </div>`;
+}
+function chQty(id,d){ haptic('light'); S.cart[id]=Math.max(0,(S.cart[id]||0)+d); if(!S.cart[id])delete S.cart[id];
+ document.getElementById('itemsList').innerHTML=S.activeRunner.items.map((it,i)=>itemRow(it,i)).join(''); renderCartBar(); }
+function renderCartBar(){
+ const bar=document.getElementById('cartBar'); if(!bar)return; const n=cartCount();
+ bar.innerHTML = n>0 ? `<div style="position:sticky;bottom:0;padding-top:8px"><button class="btn primary" onclick="goToOrder()">${I.car} ${t('confirmOrder')} · ${cartTotal()} ₽ <span style="opacity:.7">· ${n}</span></button></div>` : '';
+}
+function goToOrder(){ haptic('medium'); closeSheet(); setTimeout(()=>openSheet(orderSetupBody()),360); }
+function orderSetupBody(){
+ const r=S.activeRunner;
+ return `
+  <div class="sheet-h"><div class="h2">${t('confirmOrder')}</div></div>
+  <div class="card" style="margin-bottom:14px;display:flex;align-items:center;gap:12px">
+    <div class="av" style="width:46px;height:46px;font-size:20px;background:${r.col}">${rname(r)[0]}</div>
+    <div style="flex:1"><div style="font-weight:800">${rname(r)}</div><div class="mono" style="font-size:11px;color:var(--t3)">~${r.eta} ${t('min')} · ${r.dist} м</div></div>
+    <span class="tag">${cartCount()} ${S.lang==='ru'?'поз.':'items'}</span>
+  </div>
+  <div class="field"><label>${t('carPin')}</label><div class="minimap"><div class="mp-pulse"></div><div class="mpin">${I.pin}</div><div class="badge">${S.lang==='ru'?'пин выставлен':'pin placed'}</div></div></div>
+  <div class="field"><label>${t('carPhoto')}</label><div class="photo-up" id="carPhoto" onclick="fillPhoto()">${I.cam}<span style="font-size:13px">${S.lang==='ru'?'Добавить фото машины':'Add a photo of the car'}</span></div></div>
+  <div class="field"><label>${t('descr')}</label><textarea id="orderDesc" placeholder="${t('descrPh')}">Серый Hyundai Solaris, 3-й ряд от колонки №4, рядом синяя фура</textarea></div>
+  <div class="card" style="margin:6px 0 14px">
+    <div class="kv"><span class="k">${t('total')}</span><span class="v" style="color:var(--gold)">${cartTotal()} ₽</span></div>
+    <div class="kv"><span class="k">${t('fee')}</span><span class="v" style="color:var(--mint)">~20 ₽</span></div>
+    <div class="mono" style="font-size:10.5px;color:var(--t3);margin-top:8px;line-height:1.4">${S.lang==='ru'?'Товар оплачиваешь напрямую раннеру (нал/СБП). Платформа денег за товар не касается.':'You pay for goods directly to the runner (cash/SBP). The platform never touches money for goods.'}</div>
+  </div>
+  <button class="btn primary" onclick="placeOrder()">${I.check} ${t('confirmOrder')}</button>`;
+}
+function fillPhoto(){ haptic('light'); const el=document.getElementById('carPhoto'); el.classList.add('filled'); el.innerHTML=I.check+`<span style="font-size:13px">car_3ряд.jpg · ${S.lang==='ru'?'добавлено':'added'}</span>`; }
+function placeOrder(){
+ haptic('success'); const r=S.activeRunner;
+ S.order={ runner:r, items:{...S.cart}, total:cartTotal(), status:2, eta:r.eta, desc:document.getElementById('orderDesc')?.value||'' };
+ if(!S.messages[r.id]) S.messages[r.id]=[];
+ closeSheet(); toast(I.check, t('accepted')); S.tab='orders'; setTimeout(render,360);
+}
+
+/* ---- DRIVER: ORDERS ---- */
+function scrOrders(){
+ if(!S.order && !S.history.length) return `<div class="eyebrow"><i></i>${t('orders')}</div><div class="empty"><div class="em">📦</div><div class="h2" style="margin-bottom:6px">${t('noOrders')}</div><div class="muted" style="font-size:14px">${t('noOrdersSub')}</div><button class="btn primary" style="margin:18px auto 0;width:auto;padding:13px 22px" onclick="go('near')">${I.near} ${S.lang==='ru'?'Найти раннера':'Find a runner'}</button></div>`;
+ let html=`<div class="eyebrow"><i></i>${S.order?t('active'):t('orders')}</div>`;
+ if(S.order){ const o=S.order, r=o.runner;
+   html+=`<div class="h1" style="font-size:24px">${S.lang==='ru'?'Заказ у':'Order from'} <span class="a">${rname(r)}</span></div>
+  <div class="card" style="margin:16px 0 14px;padding:18px 14px"><div class="steps">${stepEl(1,t('step1'),o.status)}${stepEl(2,t('step2'),o.status)}${stepEl(3,t('step3'),o.status)}${stepEl(4,t('step4'),o.status)}</div></div>
+  <div class="card" style="margin-bottom:14px;padding:0;overflow:hidden"><div class="minimap" style="border-radius:0;border:0;height:130px"><div class="mp-pulse"></div><div class="mpin">${I.pin}</div><div class="badge">${rname(r)} ~${o.eta} ${t('min')} · ${r.dist} м</div></div></div>
+  <div class="runner" style="margin-bottom:14px" onclick="openChat('${r.id}')"><div class="av" style="background:${r.col}">${rname(r)[0]}<span class="on-dot"></span></div><div class="info"><div class="nm">${rname(r)}</div><div class="meta">${S.lang==='ru'?'в пути · открыть чат':'on the way · open chat'}</div></div><div class="right" style="color:var(--acc)">${I.chat}</div></div>
+  <div class="card" style="margin-bottom:14px">${Object.keys(o.items).map(id=>{const idx=id.split('_')[1];const it=r.items[+idx];const nm=S.lang==='en'?(it.ne||it.n):it.n;return `<div class="kv"><span class="k">${it.e} ${nm} ×${o.items[id]}</span><span class="v">${it.p*o.items[id]} ₽</span></div>`;}).join('')}<div class="kv"><span class="k" style="font-weight:700">${t('total')}</span><span class="v" style="color:var(--gold)">${o.total} ₽</span></div></div>
+  <button class="btn primary" onclick="openQR()">${I.qr} ${t('closeQr')}</button>
+  <div class="mono" style="text-align:center;font-size:10.5px;color:var(--t3);margin:10px 0 4px">${t('pay2runner')}</div>`;
+ }
+ if(S.history.length){
+   html+=`<div class="sec-t">${S.lang==='ru'?'История':'History'}</div>`+S.history.map((h,i)=>{const r=h.runner;const nm=S.lang==='en'?(r.nameEn||r.name):r.name;return `<div class="runner" style="margin-bottom:10px" onclick="openHistory(${i})"><div class="av" style="background:${r.col}">${nm[0]}</div><div class="info"><div class="nm">${nm}</div><div class="meta"><span class="stars-i">${'★'.repeat(h.stars)}</span> · ${h.total} ₽ · ${S.lang==='ru'?'закрыт':'closed'}</div></div><div class="right faint mono" style="font-size:11px">${h.when}</div></div>`;}).join('');
+ }
+ return html;
+}
+function stepEl(n,label,status){ const cls=status>n?'done':(status===n?'active':''); const inner=status>n?I.check:n; return `<div class="stp ${cls}"><div class="dot">${inner}</div><div class="lb">${label}</div></div>`; }
+
+/* ---- QR close cinematic ---- */
+function openQR(){
+ haptic('medium');
+ const body=`
+  <div class="sheet-h"><div class="h2">${t('closeQr')}</div></div>
+  <div class="card acc" style="text-align:center;padding:18px"><div class="mono" style="font-size:11px;color:var(--mint);letter-spacing:1px">${t('yourQr')}</div><div class="qrbig">${qrSvg()}<div class="qr-scanline"></div></div><div class="muted" style="font-size:13px">${t('scanHint')}</div></div>
+  <button class="btn primary" style="margin-top:14px" onclick="simScan()">${I.scan} ${S.lang==='ru'?'Симулировать скан раннера':'Simulate runner scan'}</button>`;
+ openSheet(body);
+}
+function qrSvg(){
+ let cells=''; const n=11;
+ for(let y=0;y<n;y++)for(let x=0;x<n;x++){ const on=((x*7+y*5+(x*y))%3===0)||((x+y)%4===0); if(on)cells+=`<rect x="${x*2}" y="${y*2}" width="1.7" height="1.7" rx="0.3" fill="#1a120a"/>`; }
+ const eye=(ox,oy)=>`<rect x="${ox}" y="${oy}" width="6" height="6" rx="1.4" fill="none" stroke="#1a120a" stroke-width="1.3"/><rect x="${ox+2}" y="${oy+2}" width="2" height="2" rx="0.5" fill="#1a120a"/>`;
+ return `<svg viewBox="-1 -1 24 24">${cells}${eye(0,0)}${eye(16,0)}${eye(0,16)}<rect x="9" y="9" width="4" height="4" rx="1" fill="#ff7a18"/></svg>`;
+}
+function simScan(){ haptic('medium'); closeSheet(); setTimeout(()=>toast(I.scan,t('scanning')),260); setTimeout(()=>{ S.order.status=4; haptic('success'); fireBurst(); },1100); }
+function fireBurst(){
+ const b=document.getElementById('burst'); let sparks='';
+ for(let i=0;i<14;i++){ const a=(i/14)*Math.PI*2; const d=90+Math.random()*60; sparks+=`<span class="spark" style="--dx:${Math.cos(a)*d}px;--dy:${Math.sin(a)*d}px;top:50%;left:50%;animation-delay:${Math.random()*.1}s;background:${i%2?'var(--gold)':'var(--mint)'}"></span>`; }
+ b.innerHTML=`${sparks}<div class="check-ring">${I.check}</div><div class="h1" style="margin-top:22px;font-size:25px">${t('closed')}</div><div class="muted" style="margin-top:8px;font-size:14px">${t('pointsEarned')}</div><button class="btn ghost sm" style="margin-top:22px;width:auto;padding:12px 24px" onclick="afterClose()">${t('leaveReview')}</button>`;
+ b.classList.add('show');
+}
+function afterClose(){ document.getElementById('burst').classList.remove('show'); render(); setTimeout(openReview,200); }
+
+/* ---- review ---- */
+function openReview(){
+ S.reviewStars=5;
+ const tags=S.lang==='ru'?['быстро','вежливо','цена честная','точно по описанию','холодное']:['fast','polite','fair price','exact match','cold'];
+ const body=`
+  <div class="sheet-h"><div class="h2">${t('rate')}</div></div>
+  <div style="text-align:center"><div class="av" style="width:62px;height:62px;font-size:27px;margin:4px auto 0;background:${S.order.runner.col}">${rname(S.order.runner)[0]}</div></div>
+  <div class="starpick" id="starpick">${[1,2,3,4,5].map(()=>`<button class="on">★</button>`).join('')}</div>
+  <div class="chips" style="justify-content:center;margin-bottom:16px">${tags.map(tg=>`<button class="chip-sel" onclick="toggleTag(this)">${tg}</button>`).join('')}</div>
+  <div class="field"><textarea id="reviewTxt" placeholder="${t('reviewPh')}"></textarea></div>
+  <div class="online-tg" style="margin-bottom:14px"><span style="font-size:13px">${t('anon')}</span><div class="switch on"></div></div>
+  <button class="btn primary" onclick="submitReview()">${I.send} ${t('send')}</button>`;
+ openSheet(body);
+ // wire star buttons
+ document.querySelectorAll('#starpick button').forEach((b,i)=>b.onclick=()=>setStars(i+1));
+}
+function setStars(n){ haptic('light'); S.reviewStars=n; document.querySelectorAll('#starpick button').forEach((b,i)=>b.classList.toggle('on',i<n)); }
+function toggleTag(el){ haptic('light'); el.classList.toggle('on'); }
+function submitReview(){ haptic('success'); closeSheet(); toast(I.check, S.lang==='ru'?'Спасибо! Отзыв опубликован':'Thanks! Review posted'); if(S.order){ S.history.unshift({runner:S.order.runner,total:S.order.total,stars:S.reviewStars,when:'14:20'}); } S.order=null; S.tab='orders'; setTimeout(render,300); }
+
+/* ---- chats ---- */
+function scrChats(){
+ const r=RUNNERS[0];
+ return `
+  <div class="eyebrow"><i></i>${t('chats')}</div>
+  <div class="h1" style="font-size:24px">${t('chats')}</div>
+  <div style="margin-top:14px">
+   <div class="chat-row" onclick="openChat('${r.id}')">
+     <div class="av" style="background:${r.col}">${rname(r)[0]}<span class="on-dot"></span></div>
+     <div style="flex:1"><div style="font-weight:800;display:flex;justify-content:space-between">${rname(r)}<span class="mono faint" style="font-size:11px">14:03</span></div><div class="muted" style="font-size:13px;margin-top:2px">${S.lang==='ru'?'Принял, иду. 8 минут 🏃':'Got it, on my way. 8 min 🏃'}</div></div>
+   </div>
+   ${S.role==='runner'?`<div class="chat-row" onclick="openChat('kostya')"><div class="av" style="background:linear-gradient(150deg,#94877a,#cabfb0)">И</div><div style="flex:1"><div style="font-weight:800;display:flex;justify-content:space-between">${S.lang==='ru'?'Игорь · 4-й ряд':'Igor · row 4'}<span class="badge-n" style="position:static">2</span></div><div class="muted" style="font-size:13px;margin-top:2px">${S.lang==='ru'?'Курица-гриль есть?':'Any grilled chicken?'}</div></div></div>`:''}
+  </div>`;
+}
+function esc(s){ return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function nowTime(){ try{ return new Date().toLocaleTimeString(S.lang==='ru'?'ru-RU':'en-GB',{hour:'2-digit',minute:'2-digit'}); }catch(e){ return '14:20'; } }
+function bubbleHTML(m){ return `<div class="msg ${m.me?'me':'them'}"><div class="bubble ${m.me?'me':'them'}">${m.raw?m.tx:(m.tx[S.lang]||m.tx.ru)}<div class="tm">${m.tm}</div></div></div>`; }
+function scrollChat(){ const sc=document.getElementById('sheetBody'); if(sc) sc.scrollTop=sc.scrollHeight; }
+function animateCounts(scope){
+ (scope||document).querySelectorAll('[data-count]').forEach(el=>{
+   if(el.dataset.done)return; el.dataset.done='1';
+   const to=parseFloat(el.getAttribute('data-count'))||0; const suf=el.getAttribute('data-suf')||''; const dur=780; let st=null;
+   function step(ts){ st=st||ts; const p=Math.min(1,(ts-st)/dur); const e=1-Math.pow(1-p,3); el.textContent=Math.round(to*e).toLocaleString('ru-RU')+suf; if(p<1)requestAnimationFrame(step); }
+   requestAnimationFrame(step);
+ });
+}
+function openChat(id){
+ haptic('medium'); S.chatWith=id; const r=RUNNERS.find(x=>x.id===id)||RUNNERS[0]; const msgs=S.messages[id]||S.messages.kostya;
+ const body=`
+  <div class="sheet-h" style="position:sticky;top:0;z-index:5;padding-top:2px;background:transparent">
+    <div class="av" style="width:44px;height:44px;font-size:19px;background:${r.col}">${rname(r)[0]}<span class="on-dot"></span></div>
+    <div style="flex:1"><div style="font-weight:800">${rname(r)}</div><div style="font-size:12px;color:var(--mint);margin-top:2px;display:flex;align-items:center;gap:5px"><span style="width:6px;height:6px;border-radius:50%;background:var(--mint);box-shadow:0 0 6px var(--mint)"></span>${t('online')}</div></div>
+    ${r.qr?`<span class="qrbadge">${I.qr}${t('qrConfirmed')}</span>`:''}
+  </div>
+  <div id="chatBody" class="chat-body">
+    <div class="chat-date">${S.lang==='ru'?'Сегодня':'Today'}</div>
+    ${msgs.map(m=>bubbleHTML(m)).join('')}
+  </div>
+  <div class="chat-input"><input id="chatInput" placeholder="${t('msgPh')}" onkeydown="if(event.key==='Enter')sendMsg()"><button class="send" onclick="sendMsg()">${I.send}</button></div>`;
+ openSheet(body); setTimeout(scrollChat,60);
+}
+function sendMsg(){
+ const inp=document.getElementById('chatInput'); if(!inp||!inp.value.trim())return; haptic('light');
+ const id=S.chatWith||'kostya'; const val=inp.value.trim(); const tm=nowTime();
+ (S.messages[id]=S.messages[id]||[]).push({me:true,raw:true,tx:esc(val),tm});
+ const cb=document.getElementById('chatBody'); cb.insertAdjacentHTML('beforeend',bubbleHTML({me:true,raw:true,tx:esc(val),tm}));
+ inp.value=''; scrollChat();
+ cb.insertAdjacentHTML('beforeend',`<div class="msg them" id="typingRow"><div class="bubble them typing"><span></span><span></span><span></span></div></div>`); scrollChat();
+ setTimeout(()=>{ const tr=document.getElementById('typingRow'); if(tr)tr.remove(); const reply=S.lang==='ru'?'Принял 👍':'Got it 👍'; const tm2=nowTime(); S.messages[id].push({me:false,tx:{ru:reply,en:reply},tm:tm2}); cb.insertAdjacentHTML('beforeend',bubbleHTML({me:false,tx:{ru:reply,en:reply},tm:tm2})); scrollChat(); haptic('light'); },1100);
+}
+
+/* ---- driver profile ---- */
+function scrProfileDriver(){
+ return `
+  <div class="eyebrow"><i></i>${t('profile')}</div>
+  <div class="card" style="display:flex;align-items:center;gap:14px;margin-bottom:14px">
+    <div class="av" style="width:60px;height:60px;font-size:25px;background:linear-gradient(150deg,#3a2e22,#27201a);border:1px solid var(--gold);color:var(--gold)">И</div>
+    <div style="flex:1"><div class="h2">${S.lang==='ru'?'Игорь':'Igor'}</div><div class="mono" style="font-size:11px;color:var(--t3);margin-top:3px">${S.lang==='ru'?'Водитель · 14 заказов':'Driver · 14 orders'}</div></div>
+    <span class="tag warn">★ 4.9</span>
+  </div>
+  ${roleSwitchCard()}${langCard()}
+  <div class="card" style="margin-top:12px;padding:4px 0">
+    ${menuRow(I.info,(S.lang==='ru'?'Как это работает':'How it works'),'openHowItWorks()')}
+    ${menuRow(I.doc,(S.lang==='ru'?'Оферта и правовая позиция':'Terms & legal'),'openLegal()')}
+    ${menuRow(I.bell,(S.lang==='ru'?'Уведомления':'Notifications'),'openNotifications()',true)}
+  </div>
+  <div class="card" style="margin-top:14px">
+    <div class="kv"><span class="k">${S.lang==='ru'?'Закрыто по QR':'Closed by QR'}</span><span class="v" style="color:var(--mint)">14</span></div>
+    <div class="kv"><span class="k">${S.lang==='ru'?'Баллов':'Points'}</span><span class="v" style="color:var(--gold)">140</span></div>
+    <div class="kv"><span class="k">${S.lang==='ru'?'Любимый раннер':'Favorite runner'}</span><span class="v">Костя</span></div>
+  </div>
+  <div class="mono" style="text-align:center;font-size:10px;color:var(--t3);margin-top:18px;line-height:1.6">КаргоБоб · ${S.lang==='ru'?'нейтральный информпосредник':'neutral info-broker'}<br>${S.lang==='ru'?'P2P · без % с товара · прототип':'P2P · 0% on goods · prototype'}</div>`;
+}
+function roleSwitchCard(){
+ return `<div class="online-tg" onclick="flipRole()" style="cursor:pointer"><div style="display:flex;align-items:center;gap:11px"><div class="icon-btn" style="color:var(--acc)">${S.role==='driver'?I.feed:I.car}</div><div><div style="font-weight:800;font-size:14px">${t('switchRole')}</div><div class="faint" style="font-size:12px">${S.role==='driver'?(S.lang==='ru'?'Стать раннером':'Become a runner'):(S.lang==='ru'?'Стать водителем':'Become a driver')}</div></div></div><div class="arr faint">→</div></div>`;
+}
+function langCard(){
+ return `<div class="online-tg" style="margin-top:12px;cursor:pointer" onclick="toggleLang()"><div style="display:flex;align-items:center;gap:11px"><div class="icon-btn">${I.globe}</div><div style="font-weight:800;font-size:14px">${t('lang')}</div></div><span class="tag neutral">${S.lang==='ru'?'Русский':'English'}</span></div>`;
+}
+function flipRole(){ haptic('medium'); setRole(S.role==='driver'?'runner':'driver'); render(); toast(I.check, S.role==='driver'?(S.lang==='ru'?'Режим водителя':'Driver mode'):(S.lang==='ru'?'Режим раннера':'Runner mode')); }
+
+/* ============ RUNNER ============ */
+function scrStore(){
+ const me=RUNNERS[0]; const items=me.items;
+ return `
+  <div class="eyebrow"><i></i>${t('store')}</div>
+  <div class="h1" style="font-size:24px">${t('myStore')}</div>
+  <div class="online-tg" style="margin:14px 0" onclick="toggleOnline()">
+    <div style="display:flex;align-items:center;gap:11px"><div class="icon-btn" style="color:${S.storeOpen?'var(--mint)':'var(--t3)'};border-color:${S.storeOpen?'var(--mint-d)':'var(--glass-brd)'}">${I.zap}</div><div><div style="font-weight:800;font-size:14px">${S.storeOpen?t('online'):t('offline')}</div><div class="faint" style="font-size:12px">${S.storeOpen?(S.lang==='ru'?'витрина видна в очереди':'store visible in the queue'):(S.lang==='ru'?'включи, чтобы получать заказы':'turn on to receive orders')}</div></div></div>
+    <div class="switch ${S.storeOpen?'on':''}"></div>
+  </div>
+  <div class="bigstat" style="margin-bottom:16px"><div class="s"><div class="n">${me.rating}</div><div class="l">${t('ratingW')}</div></div><div class="s"><div class="n" data-count="${me.orders}">0</div><div class="l">${t('deliveries')}</div></div><div class="s"><div class="n" data-count="${S.scansToday}">0</div><div class="l">${t('scansToday')}</div></div></div>
+  <div class="sec-t">${me.items.length} ${S.lang==='ru'?'позиций в витрине':'items in store'} <span class="more" onclick="addItemSheet()">+ ${t('addItem')}</span></div>
+  ${items.map((it,i)=>{const nm=S.lang==='en'?(it.ne||it.n):it.n; return `<div class="item" onclick="editItemSheet(${i})" style="cursor:pointer"><div class="ic">${it.e}</div><div style="flex:1"><div class="nm">${nm}</div>${it.sub?`<div class="sub">${it.sub}</div>`:''}</div><div class="price">${it.p} ₽</div><div class="faint" style="margin-left:9px;font-size:18px">›</div></div>`;}).join('')}
+  <button class="btn ghost" style="margin-top:8px" onclick="addItemSheet()">${I.plus}${t('addItem')}</button>`;
+}
+function toggleOnline(){ haptic('medium'); S.storeOpen=!S.storeOpen; renderScreen(); toast(I.zap, S.storeOpen?(S.lang==='ru'?'Ты на линии — заказы пошли':'You are online — orders incoming'):(S.lang==='ru'?'Ты не на линии':'You are offline')); }
+function addItemSheet(){
+ haptic('light');
+ const body=`
+  <div class="sheet-h"><div class="h2">${t('addItem')}</div></div>
+  <div class="field"><label>${t('itemName')}</label><input id="niName" placeholder="${S.lang==='ru'?'Кола 0.5, лёд':'Cola 0.5, ice'}" value="🥤 Кола 0.5"></div>
+  <div class="field"><label>${t('setPrice')}</label><input id="niPrice" type="number" placeholder="120" value="120"></div>
+  <div class="card" style="margin-bottom:14px"><div class="mono" style="font-size:10.5px;color:var(--t3);line-height:1.5">${S.lang==='ru'?'Цену ставишь сам — это твой рынок. Платформа не ограничивает наценку. Товар оплачивается P2P.':'You set the price — it is your market. The platform sets no cap. Goods are paid P2P.'}</div></div>
+  <button class="btn primary" onclick="saveItem()">${I.check} ${t('save')}</button>`;
+ openSheet(body);
+}
+function saveItem(){ haptic('success'); const nm=document.getElementById('niName')?.value||'Новый товар'; const p=+document.getElementById('niPrice')?.value||100;
+ const em=nm.match(/\p{Emoji}/u)?.[0]||'🛍️'; RUNNERS[0].items.unshift({e:em,n:nm.replace(/\p{Emoji}/u,'').trim(),ne:nm.replace(/\p{Emoji}/u,'').trim(),sub:'',p}); closeSheet(); toast(I.check,t('itemAdded')); setTimeout(renderScreen,300); }
+function scrFeed(){
+ return `
+  <div class="eyebrow"><i></i>${t('feed')}</div>
+  <div class="h1" style="font-size:24px">${t('openReq')}</div>
+  <p class="muted" style="margin:10px 0 6px;font-size:14px;line-height:1.5">${S.lang==='ru'?'Запросы водителей рядом. Возьми, найди товар, добавь в витрину и пингуй.':'Driver requests nearby. Take one, find the item, add to your store and ping.'}</p>
+  <div class="sec-t">${t('incoming')}</div>
+  <div class="card acc" style="margin-bottom:14px">
+    <div style="display:flex;align-items:center;gap:11px;margin-bottom:12px"><div class="av" style="width:44px;height:44px;font-size:18px;background:linear-gradient(150deg,#3a2e22,#27201a);border:1px solid var(--gold);color:var(--gold)">И</div><div style="flex:1"><div style="font-weight:800">${S.lang==='ru'?'Игорь · 4-й ряд':'Igor · row 4'}</div><div class="mono" style="font-size:11px;color:var(--t3)">${S.lang==='ru'?'2 поз. · вода + кофе · ~320 ₽':'2 items · water + coffee · ~320 ₽'}</div></div><span class="tag warn">${S.lang==='ru'?'новый':'new'}</span></div>
+    <button class="btn primary" onclick="acceptOrder()">${I.check} ${t('accept')} · +20 ₽</button>
+  </div>
+  <div class="sec-t">${t('reqList')}</div>
+  ${REQ_FEED.map(q=>`<div class="card" style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><div class="mono" style="font-size:11px;color:var(--t3)">${S.lang==='en'?q.whoEn:q.who}</div><div class="mono faint" style="font-size:10px">${S.lang==='en'?q.agoEn:q.ago}</div></div><div style="font-size:14.5px;font-weight:600;margin-bottom:11px">${S.lang==='en'?q.txtEn:q.txt}</div><button class="btn sec sm block" onclick="takeReq()">${I.plus}${t('addToStore')}</button></div>`).join('')}`;
+}
+function acceptOrder(){
+ haptic('success'); S.order={runner:RUNNERS[0],items:{},total:320,status:2,eta:8,desc:''}; toast(I.check,t('accepted'));
+ const body=`
+  <div class="sheet-h"><div class="h2">${S.lang==='ru'?'Заказ Игоря':'Order for Igor'}</div></div>
+  <div class="card" style="margin-bottom:12px;padding:0;overflow:hidden"><div class="minimap" style="border-radius:0;border:0"><div class="mp-pulse"></div><div class="mpin">${I.pin}</div><div class="badge">${S.lang==='ru'?'машина здесь · 120 м':'car here · 120 m'}</div></div></div>
+  <div class="card" style="margin-bottom:12px"><div style="font-size:14px;line-height:1.5">📍 ${S.lang==='ru'?'Серый Hyundai Solaris, 3-й ряд от колонки №4, рядом синяя фура':'Grey Hyundai Solaris, 3rd row from pump #4, blue truck nearby'}</div></div>
+  <div class="card" style="margin-bottom:14px"><div class="kv"><span class="k">💧 ${S.lang==='ru'?'Вода 0.5 л ×2':'Water 0.5 L ×2'}</span><span class="v">160 ₽</span></div><div class="kv"><span class="k">☕ ${S.lang==='ru'?'Кофе латте':'Latte'}</span><span class="v">180 ₽</span></div><div class="kv"><span class="k" style="color:var(--mint);font-weight:700">${t('youGet')}</span><span class="v" style="color:var(--mint)">+20 ₽</span></div></div>
+  <button class="btn primary" onclick="closeSheet();setTimeout(()=>openChat('kostya'),320)">${I.chat} ${S.lang==='ru'?'Написать водителю':'Message driver'}</button>
+  <button class="btn ghost" style="margin-top:10px" onclick="runnerScan()">${I.scan} ${t('meet')}</button>`;
+ openSheet(body); setTimeout(render,50);
+}
+function runnerScan(){ haptic('medium'); closeSheet(); setTimeout(()=>toast(I.scan,t('scanning')),260); setTimeout(()=>{ haptic('success'); S.scansToday++; if(S.order)S.order.status=4; fireBurstRunner(); render(); },1100); }
+function fireBurstRunner(){
+ const b=document.getElementById('burst'); let sparks='';
+ for(let i=0;i<14;i++){ const a=(i/14)*Math.PI*2; const d=90+Math.random()*60; sparks+=`<span class="spark" style="--dx:${Math.cos(a)*d}px;--dy:${Math.sin(a)*d}px;top:50%;left:50%;background:${i%2?'var(--gold)':'var(--mint)'}"></span>`; }
+ b.innerHTML=`${sparks}<div class="check-ring">${I.check}</div><div class="h1" style="margin-top:22px;font-size:25px">${t('closed')}</div><div class="muted" style="margin-top:8px;font-size:14px">+20 ₽ · ${S.lang==='ru'?'рейтинг растёт':'rating up'}</div><button class="btn ghost sm" style="margin-top:22px;width:auto;padding:12px 24px" onclick="document.getElementById('burst').classList.remove('show')">${S.lang==='ru'?'Готово':'Done'}</button>`;
+ b.classList.add('show');
+}
+function takeReq(){ haptic('success'); toast(I.check, t('itemAdded')); }
+function scrProfileRunner(){
+ const me=RUNNERS[0];
+ return `
+  <div class="eyebrow"><i></i>${t('profile')}</div>
+  <div class="card acc" style="display:flex;align-items:center;gap:14px;margin-bottom:14px"><div class="av" style="width:60px;height:60px;font-size:26px;background:${me.col}">${rname(me)[0]}<span class="on-dot"></span></div><div style="flex:1"><div class="h2">${rname(me)}</div><div class="mono" style="font-size:12px;color:var(--t3);margin-top:4px"><span class="stars-i">★★★★★</span> ${me.rating} · ${me.orders} ${S.lang==='ru'?'заказов':'orders'}</div></div><span class="qrbadge">${I.qr}${t('qrConfirmed')}</span></div>
+  <div class="bigstat" style="margin-bottom:18px"><div class="s"><div class="n" style="color:var(--gold)" data-count="12400" data-suf=" ₽">0</div><div class="l">${t('earned')} · ${S.lang==='ru'?'нед.':'wk'}</div></div><div class="s"><div class="n" data-count="${S.scansToday}">0</div><div class="l">${t('scansToday')}</div></div></div>
+  <div class="card" style="margin-bottom:16px;background:linear-gradient(160deg,rgba(245,165,36,.12),rgba(247,241,232,.02));border-color:rgba(245,165,36,.3)"><div style="display:flex;justify-content:space-between;align-items:center"><div><div class="mono" style="font-size:10px;letter-spacing:1px;color:var(--gold)">${t('subTitle').toUpperCase()}</div><div class="h2" style="margin-top:5px;color:var(--gold)">${S.daysLeft} ${t('daysLeft')}</div></div><div style="text-align:right"><div class="mono" style="font-size:22px;font-weight:700;color:var(--gold);display:flex;align-items:center;gap:4px">${S.stars}${I.star}</div><div class="faint mono" style="font-size:10px">${S.lang==='ru'?'баланс ★':'★ balance'}</div></div></div></div>
+  <div class="sec-t">${t('pickPkg')}</div>
+  <p class="faint" style="font-size:12.5px;margin:0 2px 12px;line-height:1.5">${t('subSub')}</p>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">${PACKS.map((p,i)=>`<div class="pkg ${p.hot?'hot':''}" onclick="buyPack(${i},this)">${p.hot?`<div class="ribbon">${t('hot')}</div>`:''}<div class="stars">${p.s}${I.star}</div><div class="d">${p.d[S.lang]}</div><div class="usd">${p.usd}</div></div>`).join('')}</div>
+  <button class="btn sec" style="margin-top:12px" onclick="openBoost()">${I.boost} ${S.lang==='ru'?'Буст позиции в выдаче':'Boost your position'}</button>
+  <div class="card" style="margin-top:16px"><div class="h2" style="font-size:15px;margin-bottom:4px">${t('refTitle')}</div><div class="muted" style="font-size:13px;line-height:1.5;margin-bottom:12px">${t('refSub')}</div><button class="btn ghost sm block" onclick="haptic('light');toast(I.check,'${S.lang==='ru'?'Ссылка скопирована':'Link copied'}')">${I.send}${t('invite')}</button></div>
+  ${roleSwitchCard()}${langCard()}
+  <div class="card" style="margin-top:12px;padding:4px 0">
+    ${menuRow(I.doc,(S.lang==='ru'?'Оферта раннера и правовая позиция':'Runner terms & legal'),'openLegal()')}
+    ${menuRow(I.info,(S.lang==='ru'?'Как это работает':'How it works'),'openHowItWorks()',true)}
+  </div>
+  <div class="mono" style="text-align:center;font-size:10px;color:var(--t3);margin:18px 0 0;line-height:1.6">${S.lang==='ru'?'Stars = только цифровой доступ · товар P2P 0% · ты сам отвечаешь за свой статус':'Stars = digital access only · goods P2P 0% · you own your legal status'}</div>`;
+}
+function buyPack(i,el){ haptic('medium'); document.querySelectorAll('.pkg').forEach(p=>p.classList.remove('sel')); el.classList.add('sel'); const p=PACKS[i];
+ setTimeout(()=>{ haptic('success'); S.stars+=p.s; S.daysLeft+=Math.round(p.s/100*1.2); toast(I.star, `${t('paid')} · +${p.s}★`); renderScreen(); },480); }
+
+/* ============ pre-order ============ */
+function openPreorder(){
+ haptic('medium');
+ const body=`
+  <div class="sheet-h"><div class="h2">${t('reqTitle')}</div></div>
+  <p class="muted" style="font-size:14px;line-height:1.5;margin-bottom:16px">${t('reqSub')}</p>
+  <div class="field"><label>${t('descr')}</label><textarea id="preTxt" placeholder="${S.lang==='ru'?'Нужна курица-гриль, если есть рядом':'Need grilled chicken if available nearby'}">Холодная вода 2 шт + лёд</textarea></div>
+  <div class="field"><label>${t('carPin')}</label><div class="minimap"><div class="mp-pulse"></div><div class="mpin">${I.pin}</div><div class="badge">${S.lang==='ru'?'пин выставлен · видно раннерам в 500 м':'pin set · visible to runners in 500 m'}</div></div></div>
+  <button class="btn primary" onclick="postPreorder()">${I.send} ${t('post')}</button>`;
+ openSheet(body);
+}
+function postPreorder(){ haptic('success'); closeSheet(); toast(I.check, t('generated')); }
+
+/* ============ mascot ============ */
+function openMascot(){
+ haptic('medium');
+ const body=`
+  <div class="sheet-h"><div class="mascot" style="position:static;width:50px;height:50px;font-size:26px;box-shadow:none"><span class="face">🤖</span></div><div style="flex:1"><div class="h2">${t('mascotHi')}</div><div class="mono faint" style="font-size:11px">CargoBob AI · ${S.lang==='ru'?'наставник':'guide'}</div></div></div>
+  <div class="bubble them" style="max-width:100%;margin-bottom:16px">${t('mascotMsg')}</div>
+  <div style="display:flex;flex-direction:column;gap:9px"><button class="btn sec sm block" style="justify-content:flex-start" onclick="mascotAns('qr')">${t('ask1')}</button><button class="btn sec sm block" style="justify-content:flex-start" onclick="mascotAns('car')">${t('ask2')}</button><button class="btn sec sm block" style="justify-content:flex-start" onclick="mascotAns('legal')">${t('ask3')}</button></div>
+  <div id="mascotAns" style="margin-top:14px"></div>`;
+ openSheet(body);
+}
+function mascotAns(k){
+ haptic('light');
+ const ans={
+  qr:{ru:'QR — это учёт встречи. Когда раннер дошёл, любая сторона сканирует код — заказ закрывается, разблокируется отзыв и капают баллы. Это не замок, а честный учёт: без скана раннер просто не виден новым заказам.',en:'QR is the proof of meeting. When the runner arrives, either side scans the code — the order closes, the review unlocks and points drop. Not a lock but honest accounting: no scan, no visibility to new orders.'},
+  car:{ru:'Твоя машина — золотой пин в центре радара. Раннеры видят его как точку в радиусе 500 м плюс твоё фото и описание ряда. Живой шаринг локации добавим в v2.',en:'Your car is the gold pin at the radar centre. Runners see it as a point within 500 m plus your photo and row description. Live location sharing comes in v2.'},
+  legal:{ru:'КаргоБоб — нейтральная доска между двумя частными лицами, как Avito. Мы не ставим цену и не касаемся денег за товар (P2P нал/СБП). Раннер сам отвечает за свой статус по законам своей страны.',en:'CargoBob is a neutral board between two private people, like a classifieds site. We set no price and never touch money for goods (P2P cash/SBP). The runner owns their legal status under their country law.'},
+ };
+ document.getElementById('mascotAns').innerHTML=`<div class="bubble them" style="max-width:100%">${ans[k][S.lang]}</div>`;
+}
+
+/* ============ generic states, menus, extra scenarios ============ */
+function menuRow(icon,label,onclick,last){ return `<div onclick="${onclick}" style="display:flex;align-items:center;gap:12px;padding:13px 16px;cursor:pointer;${last?'':'border-bottom:1px solid var(--line)'}"><div style="color:var(--acc);display:flex">${icon}</div><div style="flex:1;font-weight:600;font-size:14px">${label}</div><div class="faint" style="font-size:17px">›</div></div>`; }
+function infoSheet(title,html,icon){ haptic('light'); openSheet(`<div class="sheet-h">${icon?`<div class="icon-btn" style="color:var(--acc)">${icon}</div>`:''}<div class="h2">${title}</div></div>${html}`); }
+
+const NOTIFS=[
+ {ic:'🏃',ru:'Костя принял твой заказ',en:'Kostya accepted your order',ago:'1 мин',agoEn:'1 min',acc:true},
+ {ic:'⭐',ru:'Тимур получил твой отзыв',en:'Timur received your review',ago:'1 ч',agoEn:'1h'},
+ {ic:'🎁',ru:'Пригласи друга → +1 день доступа',en:'Invite a friend → +1 access day',ago:'2 ч',agoEn:'2h'},
+];
+function openNotifications(){
+ infoSheet(S.lang==='ru'?'Уведомления':'Notifications',
+  NOTIFS.map(n=>`<div class="runner" style="margin-bottom:10px;cursor:default"><div class="av" style="width:42px;height:42px;font-size:20px;background:${n.acc?'var(--acc-soft)':'rgba(247,241,232,.06)'};color:var(--t1);border:1px solid var(--glass-brd)">${n.ic}</div><div class="info"><div class="nm" style="font-size:14px;font-weight:600">${S.lang==='en'?n.en:n.ru}</div><div class="meta">${S.lang==='en'?n.agoEn:n.ago}</div></div></div>`).join(''), I.bell);
+}
+
+const HOTSPOTS=[
+ {ru:'АЗС на Кутузовском',en:'Gas station, Kutuzovsky',rs:18,me:true},
+ {ru:'АЗС Лукойл, МКАД 41 км',en:'Lukoil, MKAD 41 km',rs:9},
+ {ru:'Паром · Верхний Ларс',en:'Ferry · Upper Lars',rs:24},
+ {ru:'Фестиваль · Лужники',en:'Festival · Luzhniki',rs:31},
+];
+function openQueuePicker(){
+ infoSheet(S.lang==='ru'?'Выбери очередь':'Pick a queue',
+  `<p class="muted" style="font-size:13px;margin-bottom:14px;line-height:1.5">${S.lang==='ru'?'Хотспоты рядом. Движок один — работает на любой запертой очереди.':'Hotspots nearby. One engine — works on any locked queue.'}</p>`+
+  HOTSPOTS.map((h,i)=>`<div class="runner" style="margin-bottom:10px" onclick="pickQueue(${i})"><div class="av" style="width:44px;height:44px;background:${h.me?'linear-gradient(150deg,#ff7a18,#f5a524)':'rgba(247,241,232,.06)'};color:${h.me?'#1a120a':'var(--t2)'};border:1px solid var(--glass-brd)">${I.pin}</div><div class="info"><div class="nm" style="font-size:14.5px">${S.lang==='en'?h.en:h.ru}</div><div class="meta">${h.rs} ${S.lang==='ru'?'раннеров в эфире':'runners live'}</div></div>${h.me?`<span class="tag">${S.lang==='ru'?'тут':'here'}</span>`:`<div class="right faint" style="font-size:18px">→</div>`}</div>`).join(''), I.pin);
+}
+function pickQueue(i){ haptic('medium'); closeSheet(); toast(I.check, (S.lang==='en'?HOTSPOTS[i].en:HOTSPOTS[i].ru)); }
+
+function editItemSheet(i){
+ haptic('light'); const it=RUNNERS[0].items[i]; const nm=S.lang==='en'?(it.ne||it.n):it.n;
+ openSheet(`<div class="sheet-h"><div class="icon-btn" style="background:var(--acc-soft);border-color:var(--acc-line);color:var(--acc);font-size:22px">${it.e}</div><div class="h2">${S.lang==='ru'?'Товар витрины':'Store item'}</div></div>
+  <div class="field"><label>${t('itemName')}</label><input id="edName" value="${it.e} ${nm}"></div>
+  <div class="field"><label>${t('setPrice')}</label><input id="edPrice" type="number" value="${it.p}"></div>
+  <button class="btn primary" onclick="saveEdit(${i})">${I.check} ${t('save')}</button>
+  <button class="btn danger" style="margin-top:10px" onclick="delItem(${i})">${S.lang==='ru'?'Удалить из витрины':'Remove from store'}</button>`);
+}
+function saveEdit(i){ haptic('success'); const it=RUNNERS[0].items[i]; const v=document.getElementById('edPrice')?.value; if(v)it.p=+v; const nm=document.getElementById('edName')?.value; if(nm){ it.e=nm.match(/\p{Emoji}/u)?.[0]||it.e; it.n=it.ne=nm.replace(/\p{Emoji}/u,'').trim(); } closeSheet(); toast(I.check,S.lang==='ru'?'Сохранено':'Saved'); setTimeout(renderScreen,260); }
+function delItem(i){ haptic('warning'); RUNNERS[0].items.splice(i,1); closeSheet(); toast(I.check,S.lang==='ru'?'Удалено из витрины':'Removed from store'); setTimeout(renderScreen,260); }
+
+function openHistory(i){
+ haptic('light'); const h=S.history[i]; const r=h.runner; const nm=S.lang==='en'?(r.nameEn||r.name):r.name;
+ openSheet(`<div class="sheet-h"><div class="av" style="width:52px;height:52px;font-size:22px;background:${r.col}">${nm[0]}</div><div style="flex:1"><div class="h2">${nm}</div><div class="mono" style="font-size:11px;color:var(--mint);margin-top:3px">${S.lang==='ru'?'закрыт по QR':'closed by QR'} · ${h.when}</div></div><span class="tag warn">${'★'.repeat(h.stars)}</span></div>
+  <div class="card"><div class="kv"><span class="k">${t('total')}</span><span class="v" style="color:var(--gold)">${h.total} ₽</span></div><div class="kv"><span class="k">${S.lang==='ru'?'Доставка (нам)':'Delivery (to us)'}</span><span class="v" style="color:var(--mint)">~20 ₽</span></div><div class="kv"><span class="k">${S.lang==='ru'?'Способ':'Method'}</span><span class="v">P2P · ${S.lang==='ru'?'нал/СБП':'cash/SBP'}</span></div></div>
+  <button class="btn primary" style="margin-top:14px" onclick="closeSheet();setTimeout(()=>openRunner('${r.id}'),330)">${I.store} ${S.lang==='ru'?'Заказать снова':'Order again'}</button>`);
+}
+
+function openBoost(){
+ infoSheet(S.lang==='ru'?'Буст позиции':'Position boost',
+  `<p class="muted" style="font-size:13px;line-height:1.5;margin-bottom:14px">${S.lang==='ru'?'Подними витрину выше в выдаче на 2 часа. Аукцион Stars, помечается «продвижение». Органика всё равно доминирует.':'Lift your store higher for 2 hours. Stars auction, marked “promoted”. Organic still dominates.'}</p>
+  <div class="card acc" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px"><div><div style="font-weight:800">${S.lang==='ru'?'Топ выдачи · 2 ч':'Top of feed · 2h'}</div><div class="mono faint" style="font-size:11px;margin-top:3px">${S.lang==='ru'?'помечено «продвижение»':'marked “promoted”'}</div></div><div class="mono" style="font-weight:700;font-size:20px;color:var(--gold);display:flex;align-items:center;gap:4px">150${I.star}</div></div>
+  <button class="btn primary" onclick="haptic('success');closeSheet();toast(I.star,'${S.lang==='ru'?'Буст активен · 2 ч':'Boost active · 2h'}')">${I.boost} ${S.lang==='ru'?'Активировать':'Activate'}</button>`, I.boost);
+}
+
+function openHowItWorks(){
+ const steps=S.lang==='ru'
+  ?[['1','Заказ','Выбери позицию из витрины или оставь предзаказ. Гео-пин, фото машины, описание ряда.'],['2','Приём','Раннер подтверждает, берёт товар и идёт к твоей машине.'],['3','Передача','Платишь за товар напрямую раннеру — наличка или СБП. Платформа денег не касается.'],['4','Закрытие','Скан QR закрывает заказ, начисляет баллы и открывает отзыв.']]
+  :[['1','Order','Pick from the store or leave a pre-order. Geo-pin, car photo, row description.'],['2','Accept','The runner confirms, grabs the item and walks to your car.'],['3','Handover','You pay for goods directly to the runner — cash or SBP. The platform never touches money.'],['4','Close','A QR scan closes the order, grants points and unlocks the review.']];
+ infoSheet(S.lang==='ru'?'Как это работает':'How it works',
+  steps.map(s=>`<div style="display:flex;gap:13px;margin-bottom:16px"><div class="snum" style="flex:none;width:30px;height:30px;border-radius:10px;background:var(--acc);color:#1a120a;font-family:var(--mono);font-weight:700;display:flex;align-items:center;justify-content:center">${s[0]}</div><div><div style="font-weight:800;font-size:15px">${s[1]}</div><div class="muted" style="font-size:13px;line-height:1.45;margin-top:3px">${s[2]}</div></div></div>`).join(''), I.info);
+}
+function openLegal(){
+ const pts=S.lang==='ru'
+  ?['Платформа — нейтральная информ-доска между двумя частными лицами. Цену не ставит, в сделку не входит.','Оплата товара — P2P напрямую покупатель→раннер (нал/СБП). Мы денег за товар не касаемся (0%).','Раннер сам отвечает за свой правовой и налоговый статус по законам своей страны.','Stars — только за цифровой доступ (пакеты доставок), не за физический товар.','Подакцизное (алкоголь/табак/топливо) и лекарства исключены навсегда.','PII раннера не собираем. Спорные вопросы закрываем юрзаключением до запуска.']
+  :['The platform is a neutral info-board between two private people. It sets no price and is not a party to the deal.','Payment for goods is P2P, buyer→runner directly (cash/SBP). We never touch money for goods (0%).','The runner is responsible for their own legal and tax status under their country law.','Stars are for digital access only (delivery packs), never for physical goods.','Excise goods (alcohol/tobacco/fuel) and medicines are excluded forever.','We do not collect runner PII. Edge cases are closed by a legal opinion before launch.'];
+ infoSheet(S.lang==='ru'?'Правовая позиция':'Legal position',
+  pts.map(p=>`<div style="display:flex;gap:12px;margin-bottom:14px"><div style="flex:none;width:7px;height:7px;border-radius:50%;background:var(--acc);margin-top:7px;box-shadow:0 0 8px var(--acc)"></div><div class="muted" style="font-size:13.5px;line-height:1.5">${p}</div></div>`).join('')+`<div class="mono faint" style="font-size:10px;text-align:center;margin-top:6px">${S.lang==='ru'?'нейтральный информпосредник · модель Avito':'neutral info-broker · classifieds model'}</div>`, I.doc);
+}
+
+/* ============ sheet / toast helpers ============ */
+function openSheet(html){
+ const s=document.getElementById('sheet'); document.getElementById('sheetBody').innerHTML=html;
+ s.classList.add('show'); document.getElementById('scrim').classList.add('show'); s.querySelector('.s-scroll').scrollTop=0;
+ try{ TG?.BackButton?.show(); TG?.BackButton?.onClick(closeSheet); }catch(e){}
+}
+function closeSheet(){ document.getElementById('sheet').classList.remove('show'); document.getElementById('scrim').classList.remove('show'); try{ TG?.BackButton?.hide(); }catch(e){} }
+let toastTimer;
+function toast(icon,msg){ const el=document.getElementById('toast'); el.innerHTML=`${icon}<span>${msg}</span>`; el.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(()=>el.classList.remove('show'),2400); }
+</script>
+</body>
+</html>
