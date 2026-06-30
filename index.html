@@ -386,6 +386,12 @@ body.runner .btn.primary{background:linear-gradient(150deg,var(--mint),var(--min
 .onb-logo::after{content:"";position:absolute;top:5px;left:9px;right:9px;height:36%;border-radius:13px;background:linear-gradient(180deg,rgba(255,255,255,.5),transparent)}
 .onb-logo svg{width:52px;height:52px;position:relative;z-index:1}
 .mascot svg{width:34px;height:34px}
+/* Боб живой — моргание обоими + подмигивание правым */
+.bob-eye-l,.bob-eye-r{transform-box:fill-box;transform-origin:center;animation:bobBlink 3.6s ease-in-out infinite}
+.bob-eye-r{animation-name:bobWink}
+@keyframes bobBlink{0%,74%,82%,100%{transform:scaleY(1)}78%{transform:scaleY(.1)}}
+@keyframes bobWink{0%,34%,44%,74%,82%,100%{transform:scaleY(1)}39%{transform:scaleY(.1)}78%{transform:scaleY(.1)}}
+@media(prefers-reduced-motion:reduce){.bob-eye-l,.bob-eye-r{animation:none}}
 .rolecard{position:relative;background:var(--glass);-webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur);border:1px solid var(--glass-brd);box-shadow:var(--glass-hi),var(--glass-sh);border-radius:22px;padding:20px;display:flex;gap:15px;align-items:center;cursor:pointer;transition:.22s var(--spring);margin-bottom:14px;overflow:hidden}
 .rolecard::before{content:"";position:absolute;top:0;left:0;right:0;height:46%;background:linear-gradient(180deg,rgba(255,255,255,.07),transparent);pointer-events:none}
 .rolecard:active{transform:scale(.98)}
@@ -432,7 +438,7 @@ body.runner .btn.primary{background:linear-gradient(150deg,var(--mint),var(--min
 
     <!-- ONBOARDING -->
     <div class="onb" id="onb">
-      <div class="onb-logo"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3.4v2.1" stroke="#2a1c10" stroke-width="1.7" stroke-linecap="round"/><circle cx="12" cy="3" r="1.5" fill="#57e0c8"/><rect x="4.6" y="8.4" width="14.8" height="8" rx="4" fill="#241a12"/><circle cx="9.3" cy="12.4" r="1.95" fill="#57e0c8"/><circle cx="14.7" cy="12.4" r="1.95" fill="#57e0c8"/><circle cx="9.9" cy="11.8" r=".6" fill="#fff"/><circle cx="15.3" cy="11.8" r=".6" fill="#fff"/><path d="M9 19c1.4 1.3 4.6 1.3 6 0" stroke="#2a1c10" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+      <div class="onb-logo"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3.4v2.1" stroke="#2a1c10" stroke-width="1.7" stroke-linecap="round"/><circle cx="12" cy="3" r="1.5" fill="#57e0c8"/><rect x="4.6" y="8.4" width="14.8" height="8" rx="4" fill="#241a12"/><circle class="bob-eye-l" cx="9.3" cy="12.4" r="1.95" fill="#57e0c8"/><circle class="bob-eye-r" cx="14.7" cy="12.4" r="1.95" fill="#57e0c8"/><circle cx="9.9" cy="11.8" r=".6" fill="#fff"/><circle cx="15.3" cy="11.8" r=".6" fill="#fff"/><path d="M9 19c1.4 1.3 4.6 1.3 6 0" stroke="#2a1c10" stroke-width="1.6" stroke-linecap="round"/></svg></div>
       <div class="eyebrow"><i></i>Telegram Mini App</div>
       <div class="h1" style="font-size:36px">Кто ты<br>в очереди?</div>
       <p class="muted" style="margin:14px 0 30px;font-size:15px;line-height:1.5">КаргоБоб — мост последних 500&nbsp;метров. Выбери роль — переключить можно в любой момент.</p>
@@ -460,7 +466,7 @@ body.runner .btn.primary{background:linear-gradient(150deg,var(--mint),var(--min
       <div class="nav" id="nav"></div>
     </div>
 
-    <div class="mascot" id="mascot" onclick="openMascot()" style="display:none"><svg viewBox="0 0 36 36" fill="none"><rect x="4" y="7" width="28" height="24" rx="9" fill="#ff7a18"/><rect x="4" y="7" width="28" height="11" rx="9" fill="#fff" opacity=".22"/><path d="M18 2.6v3" stroke="#2a1c10" stroke-width="2" stroke-linecap="round"/><circle cx="18" cy="2.3" r="1.8" fill="#57e0c8"/><rect x="8" y="13.5" width="20" height="9" rx="4.5" fill="#241a12"/><circle cx="14" cy="18" r="2.1" fill="#57e0c8"/><circle cx="22" cy="18" r="2.1" fill="#57e0c8"/><circle cx="14.7" cy="17.4" r=".7" fill="#fff"/><circle cx="22.7" cy="17.4" r=".7" fill="#fff"/><path d="M13.5 26c1.6 1.4 5.4 1.4 7 0" stroke="#2a1c10" stroke-width="1.9" stroke-linecap="round"/></svg><span class="ping"></span></div>
+    <div class="mascot" id="mascot" onclick="openMascot()" style="display:none"><svg viewBox="0 0 36 36" fill="none"><rect x="4" y="7" width="28" height="24" rx="9" fill="#ff7a18"/><rect x="4" y="7" width="28" height="11" rx="9" fill="#fff" opacity=".22"/><path d="M18 2.6v3" stroke="#2a1c10" stroke-width="2" stroke-linecap="round"/><circle cx="18" cy="2.3" r="1.8" fill="#57e0c8"/><rect x="8" y="13.5" width="20" height="9" rx="4.5" fill="#241a12"/><circle class="bob-eye-l" cx="14" cy="18" r="2.1" fill="#57e0c8"/><circle class="bob-eye-r" cx="22" cy="18" r="2.1" fill="#57e0c8"/><circle cx="14.7" cy="17.4" r=".7" fill="#fff"/><circle cx="22.7" cy="17.4" r=".7" fill="#fff"/><path d="M13.5 26c1.6 1.4 5.4 1.4 7 0" stroke="#2a1c10" stroke-width="1.9" stroke-linecap="round"/></svg><span class="ping"></span></div>
 
     <div class="scrim" id="scrim" onclick="closeSheet()"></div>
     <div class="sheet" id="sheet"><div class="grab"></div><div class="s-scroll" id="sheetBody"></div></div>
@@ -592,8 +598,8 @@ const IF={
 };
 /* ===== Боб — фирменный маскот (единый знак) ===== */
 const BOB={
- features:'<svg viewBox="0 0 24 24" fill="none"><path d="M12 3.4v2.1" stroke="#2a1c10" stroke-width="1.7" stroke-linecap="round"/><circle cx="12" cy="3" r="1.5" fill="#57e0c8"/><rect x="4.6" y="8.4" width="14.8" height="8" rx="4" fill="#241a12"/><circle cx="9.3" cy="12.4" r="1.95" fill="#57e0c8"/><circle cx="14.7" cy="12.4" r="1.95" fill="#57e0c8"/><circle cx="9.9" cy="11.8" r=".6" fill="#fff"/><circle cx="15.3" cy="11.8" r=".6" fill="#fff"/><path d="M9 19c1.4 1.3 4.6 1.3 6 0" stroke="#2a1c10" stroke-width="1.6" stroke-linecap="round"/></svg>',
- head:'<svg viewBox="0 0 36 36" fill="none"><rect x="4" y="7" width="28" height="24" rx="9" fill="#ff7a18"/><rect x="4" y="7" width="28" height="11" rx="9" fill="#fff" opacity=".22"/><path d="M18 2.6v3" stroke="#2a1c10" stroke-width="2" stroke-linecap="round"/><circle cx="18" cy="2.3" r="1.8" fill="#57e0c8"/><rect x="8" y="13.5" width="20" height="9" rx="4.5" fill="#241a12"/><circle cx="14" cy="18" r="2.1" fill="#57e0c8"/><circle cx="22" cy="18" r="2.1" fill="#57e0c8"/><circle cx="14.7" cy="17.4" r=".7" fill="#fff"/><circle cx="22.7" cy="17.4" r=".7" fill="#fff"/><path d="M13.5 26c1.6 1.4 5.4 1.4 7 0" stroke="#2a1c10" stroke-width="1.9" stroke-linecap="round"/></svg>',
+ features:'<svg viewBox="0 0 24 24" fill="none"><path d="M12 3.4v2.1" stroke="#2a1c10" stroke-width="1.7" stroke-linecap="round"/><circle cx="12" cy="3" r="1.5" fill="#57e0c8"/><rect x="4.6" y="8.4" width="14.8" height="8" rx="4" fill="#241a12"/><circle class="bob-eye-l" cx="9.3" cy="12.4" r="1.95" fill="#57e0c8"/><circle class="bob-eye-r" cx="14.7" cy="12.4" r="1.95" fill="#57e0c8"/><circle cx="9.9" cy="11.8" r=".6" fill="#fff"/><circle cx="15.3" cy="11.8" r=".6" fill="#fff"/><path d="M9 19c1.4 1.3 4.6 1.3 6 0" stroke="#2a1c10" stroke-width="1.6" stroke-linecap="round"/></svg>',
+ head:'<svg viewBox="0 0 36 36" fill="none"><rect x="4" y="7" width="28" height="24" rx="9" fill="#ff7a18"/><rect x="4" y="7" width="28" height="11" rx="9" fill="#fff" opacity=".22"/><path d="M18 2.6v3" stroke="#2a1c10" stroke-width="2" stroke-linecap="round"/><circle cx="18" cy="2.3" r="1.8" fill="#57e0c8"/><rect x="8" y="13.5" width="20" height="9" rx="4.5" fill="#241a12"/><circle class="bob-eye-l" cx="14" cy="18" r="2.1" fill="#57e0c8"/><circle class="bob-eye-r" cx="22" cy="18" r="2.1" fill="#57e0c8"/><circle cx="14.7" cy="17.4" r=".7" fill="#fff"/><circle cx="22.7" cy="17.4" r=".7" fill="#fff"/><path d="M13.5 26c1.6 1.4 5.4 1.4 7 0" stroke="#2a1c10" stroke-width="1.9" stroke-linecap="round"/></svg>',
 };
 
 /* ============ mock data ============ */
